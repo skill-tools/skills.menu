@@ -107,6 +107,34 @@ const result = parseSkillContent(rawMarkdown, '/path/SKILL.md', '/path');</code>
 		<li>Path traversal guard on file references</li>
 	</ul>
 
+	<h2>Test Coverage</h2>
+	<p>21 tests across 3 suites. Run with <code>npx vitest run</code> from the package directory.</p>
+
+	<h3><code>parser.test.ts</code> (14 tests)</h3>
+	<ul>
+		<li>Parses valid skills, minimal skills, and content from strings</li>
+		<li>Reports errors: non-existent files, invalid name format, missing description, broken file references</li>
+		<li>Extracts sections correctly from markdown body</li>
+		<li>Fails on empty content and invalid YAML frontmatter</li>
+		<li>Warns when token count exceeds budget and for too-short descriptions</li>
+		<li>Errors for too-long descriptions (&gt;1024 chars), missing name, consecutive hyphens</li>
+		<li>Preserves extra metadata fields from frontmatter</li>
+	</ul>
+
+	<h3><code>resolver.test.ts</code> (5 tests)</h3>
+	<ul>
+		<li>Resolves single SKILL.md files, directories containing SKILL.md, and multiple skills from parent directories</li>
+		<li>Returns empty array for non-existent paths</li>
+		<li>Returns sorted results</li>
+	</ul>
+
+	<h3><code>tokenizer.test.ts</code> (5 tests)</h3>
+	<ul>
+		<li>Returns 0 for empty string</li>
+		<li>Counts tokens for simple text, longer text, and markdown content</li>
+		<li>Returns consistent results for same input</li>
+	</ul>
+
 	<h2>Dependencies</h2>
 	<ul>
 		<li><code>gray-matter</code> &mdash; YAML frontmatter parsing</li>
