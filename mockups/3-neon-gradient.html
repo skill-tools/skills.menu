@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 3 — Neon Gradient</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090b;--bg2:#18181b;--bg3:#27272a;--border:#3f3f46;--border2:#52525b;
+  --text:#fafafa;--muted:#a1a1aa;--dim:#71717a;
+  --grad1:#8b5cf6;--grad2:#06b6d4;--grad3:#ec4899;
+  --font-sans:'Space Grotesk',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --max-w:1100px;
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--grad2);text-decoration:none}
+a:hover{color:#fff}
+code{font-family:var(--font-mono);background:var(--bg2);padding:.15em .4em;border-radius:4px;font-size:.875em;border:1px solid var(--border)}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 1.5rem}
+.gradient-text{background:linear-gradient(135deg,var(--grad1),var(--grad2),var(--grad3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+header{border-bottom:1px solid var(--border);padding:1rem 0;background:rgba(9,9,11,.85);backdrop-filter:blur(16px);position:sticky;top:0;z-index:100}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:var(--max-w);margin:0 auto;padding:0 1.5rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-family:var(--font-sans);font-weight:700;font-size:1.15rem;color:var(--text)}
+.logo:hover .logo-text{background:linear-gradient(135deg,var(--grad1),var(--grad2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo svg{width:30px;height:30px}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center}
+.nav-links a{color:var(--muted);font-size:.9rem;font-weight:500}
+.nav-links a:hover{color:var(--text)}
+
+.hero{padding:6rem 0 4rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(139,92,246,.12),rgba(6,182,212,.06),transparent 70%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.78rem;color:var(--grad2);border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.08);padding:.35em .9em;border-radius:20px;margin-bottom:2rem}
+.hero h1{font-size:clamp(2.5rem,6vw,4.25rem);font-weight:700;letter-spacing:-.04em;line-height:1.1;margin-bottom:1.25rem;position:relative}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:520px;margin:0 auto 2.5rem;line-height:1.7}
+.hero-actions{display:flex;gap:1rem;justify-content:center;margin-bottom:3.5rem}
+.btn{padding:.7rem 1.5rem;border-radius:10px;font-size:.9rem;font-weight:600;border:1px solid transparent;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--grad1),var(--grad2));color:#fff;border:none;box-shadow:0 4px 20px rgba(139,92,246,.25)}
+.btn-primary:hover{box-shadow:0 4px 30px rgba(139,92,246,.4);transform:translateY(-1px);color:#fff}
+.btn-ghost{border-color:var(--border2);color:var(--text);background:transparent}
+.btn-ghost:hover{border-color:var(--muted);background:var(--bg2)}
+
+.terminal-wrap{max-width:620px;margin:0 auto;position:relative}
+.terminal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;text-align:left;box-shadow:0 0 40px rgba(139,92,246,.08)}
+.terminal-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border)}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#f87171}.dot-y{background:#facc15}.dot-g{background:#4ade80}
+.terminal-title{font-family:var(--font-mono);font-size:.7rem;color:var(--dim);margin-left:.5rem}
+.terminal pre{margin:0;padding:1.25rem;font-size:.82rem;line-height:1.8;background:transparent;border:none;color:var(--text)}
+.terminal .prompt{color:var(--grad2)}.terminal .cmt{color:var(--dim)}
+
+.features{padding:5rem 0}
+.features h2{text-align:center;font-size:1.75rem;margin-bottom:.5rem;font-weight:700}
+.features .sub{text-align:center;color:var(--muted);margin-bottom:3rem}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.75rem;transition:all .25s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--grad1),var(--grad2));opacity:0;transition:opacity .25s}
+.card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.card:hover::before{opacity:1}
+.card-num{font-family:var(--font-mono);font-size:.75rem;margin-bottom:.75rem;font-weight:600}
+.card-num span{background:linear-gradient(135deg,var(--grad1),var(--grad2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.card h3{font-family:var(--font-mono);font-size:1.05rem;margin-bottom:.5rem;font-weight:600}
+.card p{font-size:.875rem;color:var(--muted);line-height:1.6}
+.tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1rem}
+.tag{font-family:var(--font-mono);font-size:.65rem;padding:.2em .55em;border-radius:4px;background:rgba(139,92,246,.1);color:var(--grad1);border:1px solid rgba(139,92,246,.2)}
+
+.preview{padding:5rem 0}
+.preview h2{text-align:center;margin-bottom:.5rem;font-size:1.75rem;font-weight:700}
+.preview .sub{text-align:center;color:var(--muted);margin-bottom:3rem}
+.preview-grid{display:grid;grid-template-columns:1fr 280px;gap:2rem;align-items:start}
+.anno{display:flex;flex-direction:column;gap:1rem}
+.anno-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+.anno-label{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;font-weight:600;background:linear-gradient(135deg,var(--grad1),var(--grad2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.anno-item p{font-size:.82rem;color:var(--muted);line-height:1.5}
+.hl-d{color:var(--dim)}.hl-k{color:var(--grad2)}.hl-v{color:var(--text)}.hl-s{color:#4ade80}.hl-h{color:var(--text);font-weight:600}.hl-h2{color:var(--muted);font-weight:500}.hl-c{color:#facc15}
+
+.cta{padding:3rem 0}
+.cta-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:3.5rem;text-align:center;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--grad1),var(--grad2),transparent)}
+.cta-box h2{margin-bottom:1rem;font-size:1.5rem;font-weight:700}
+.cta-box p{color:var(--muted);max-width:500px;margin:0 auto 2rem;line-height:1.7}
+.cta-links{display:flex;gap:1rem;justify-content:center}
+
+footer{border-top:1px solid var(--border);padding:2rem 0;margin-top:4rem}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;max-width:var(--max-w);margin:0 auto;padding:0 1.5rem;font-size:.8rem;color:var(--dim)}
+.footer-links{display:flex;gap:1.5rem;list-style:none}
+.footer-links a{color:var(--muted);font-size:.8rem}
+
+@media(max-width:768px){.grid,.preview-grid{grid-template-columns:1fr}.hero-actions,.cta-links{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+
+<header>
+<nav class="container">
+  <a href="#" class="logo">
+    <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <rect width="30" height="30" rx="8" fill="url(#g1)"/>
+      <path d="M8 11l4 4-4 4" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="15" y1="19" x2="22" y2="19" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-text">skills.menu</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">Spec</a></li>
+    <li><a href="#">GitHub</a></li>
+  </ul>
+</nav>
+</header>
+
+<section class="hero">
+<div class="container">
+  <div class="hero-tag">&#9679; v0.1.0 &mdash; agentskills.io</div>
+  <h1><span class="gradient-text">Tooling</span> for<br>Agent Skills</h1>
+  <p>Validate, lint, score, route, and generate <code>SKILL.md</code> files. Open-source. Zero LLM dependencies.</p>
+  <div class="hero-actions">
+    <a href="#" class="btn btn-primary">View on GitHub</a>
+    <a href="#" class="btn btn-ghost">Read the Docs</a>
+  </div>
+  <div class="terminal-wrap">
+    <div class="terminal">
+      <div class="terminal-bar"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="terminal-title">terminal</span></div>
+      <pre><code><span class="prompt">$</span> npm install @skillkit/core       <span class="cmt"># parser &amp; types</span>
+<span class="prompt">$</span> npm install -g skillkit           <span class="cmt"># CLI validator</span>
+<span class="prompt">$</span> npm install skillrouter           <span class="cmt"># semantic routing</span>
+<span class="prompt">$</span> npm install -g skillgen           <span class="cmt"># OpenAPI generator</span></code></pre>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="features">
+<div class="container">
+  <h2>Four tools, one ecosystem</h2>
+  <p class="sub">Everything you need to build, validate, and deploy agent skills at scale.</p>
+  <div class="grid">
+    <div class="card"><div class="card-num"><span>01</span></div><h3>@skillkit/core</h3><p>Parse SKILL.md files, extract metadata, count tokens, resolve file references. The foundation.</p><div class="tags"><span class="tag">parser</span><span class="tag">types</span><span class="tag">tokenizer</span></div></div>
+    <div class="card"><div class="card-num"><span>02</span></div><h3>skillkit</h3><p>CLI for validating, linting, and quality-scoring skills. 8 lint rules, 5 scoring dimensions.</p><div class="tags"><span class="tag">CLI</span><span class="tag">validate</span><span class="tag">lint</span><span class="tag">score</span></div></div>
+    <div class="card"><div class="card-num"><span>03</span></div><h3>skillrouter</h3><p>Semantic skill selection using TF-IDF embeddings. Zero external dependencies.</p><div class="tags"><span class="tag">embeddings</span><span class="tag">routing</span><span class="tag">search</span></div></div>
+    <div class="card"><div class="card-num"><span>04</span></div><h3>skillgen</h3><p>Generate SKILL.md from OpenAPI 3.x specs or plain text. Unified or per-endpoint.</p><div class="tags"><span class="tag">OpenAPI</span><span class="tag">generator</span><span class="tag">CLI</span></div></div>
+  </div>
+</div>
+</section>
+
+<section class="preview">
+<div class="container">
+  <h2>What's a SKILL.md?</h2>
+  <p class="sub">A portable format for AI agent instructions. YAML frontmatter + Markdown body.</p>
+  <div class="preview-grid">
+    <div class="terminal">
+      <div class="terminal-bar"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="terminal-title">deploy-vercel/SKILL.md</span></div>
+      <pre><code><span class="hl-d">---</span>
+<span class="hl-k">name:</span> <span class="hl-v">deploy-vercel</span>
+<span class="hl-k">description:</span> <span class="hl-s">Deploy web apps to Vercel.</span>
+<span class="hl-k">version:</span> <span class="hl-v">1.0.0</span>
+<span class="hl-d">---</span>
+
+<span class="hl-h"># Deploy to Vercel</span>
+
+<span class="hl-h2">## Prerequisites</span>
+- Vercel CLI installed (<span class="hl-c">`npm i -g vercel`</span>)
+
+<span class="hl-h2">## Steps</span>
+1. Run <span class="hl-c">`vercel --prod`</span>
+2. Verify deployment URL
+3. Report live URL to user</code></pre>
+    </div>
+    <div class="anno">
+      <div class="anno-item"><div class="anno-label">frontmatter</div><p>YAML metadata for discovery and routing.</p></div>
+      <div class="anno-item"><div class="anno-label">description</div><p>Tells agents when to use this skill.</p></div>
+      <div class="anno-item"><div class="anno-label">body</div><p>Markdown instructions. Keep under 5,000 tokens.</p></div>
+      <div class="anno-item"><div class="anno-label">resources</div><p>Use scripts/, references/, assets/ directories.</p></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="cta">
+<div class="container">
+  <div class="cta-box">
+    <h2>Built on an open standard</h2>
+    <p>Implements the Agent Skills specification &mdash; a portable, vendor-neutral format for AI agent capabilities.</p>
+    <div class="cta-links">
+      <a href="#" class="btn btn-primary">Read the Spec</a>
+      <a href="#" class="btn btn-ghost">Reference Library</a>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+<div class="footer-inner container">
+  <span>Built for the Agent Skills open standard</span>
+  <ul class="footer-links"><li><a href="#">Specification</a></li><li><a href="#">Source</a></li></ul>
+</div>
+</footer>
+</body>
+</html>

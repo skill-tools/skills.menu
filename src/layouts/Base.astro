@@ -1,0 +1,268 @@
+---
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = 'Open-source developer toolkit for agent skills. Build, validate, route, and generate SKILL.md files — the portable format for AI agent capabilities.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta name="generator" content={Astro.generator} />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<canvas id="bg-canvas"></canvas>
+
+		<header>
+			<nav>
+				<a href="/" class="logo">
+					<div class="logo-mark">
+						<div class="l1"></div>
+						<div class="l2"></div>
+						<div class="l3"></div>
+						<div class="l4"></div>
+					</div>
+					skills.menu
+				</a>
+				<ul class="nav-links">
+					<li><a href="#">Tools</a></li>
+					<li><a href="/docs/core">Docs</a></li>
+					<li><a href="/docs/specification">Specification</a></li>
+					<li><a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener" class="nav-cta">Get Started</a></li>
+				</ul>
+				<button class="mobile-menu" aria-label="Menu">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+				</button>
+			</nav>
+		</header>
+
+		<main>
+			<slot />
+		</main>
+
+		<footer>
+			<div class="container footer-inner">
+				<span>Built for <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a></span>
+				<ul class="foot-links">
+					<li><a href="https://agentskills.io/specification" target="_blank" rel="noopener">Specification</a></li>
+					<li><a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener">GitHub</a></li>
+					<li><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">Reference</a></li>
+				</ul>
+			</div>
+		</footer>
+
+		<script src="/webgl-bg.js" is:inline></script>
+	</body>
+</html>
+
+<style>
+	/* ─── WebGL Canvas ─── */
+	#bg-canvas {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 0;
+		pointer-events: none;
+	}
+
+	/* ─── Header ─── */
+	header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 200;
+		padding: 1.1rem 0;
+		background: rgba(0, 0, 0, 0.7);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+	}
+
+	header nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		max-width: var(--max-w);
+		margin: 0 auto;
+		padding: 0 2rem;
+	}
+
+	.logo {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		font-family: var(--font-head);
+		font-weight: 700;
+		font-size: 1.15rem;
+		color: var(--text);
+	}
+
+	.logo:hover {
+		color: var(--green);
+	}
+
+	.logo-mark {
+		width: 34px;
+		height: 34px;
+		position: relative;
+	}
+
+	.logo-mark .l1 {
+		position: absolute;
+		width: 15px;
+		height: 15px;
+		border-radius: 3px 3px 3px 9px;
+		background: var(--green);
+		top: 0;
+		left: 0;
+	}
+
+	.logo-mark .l2 {
+		position: absolute;
+		width: 15px;
+		height: 15px;
+		border-radius: 3px 3px 9px 3px;
+		background: var(--pink);
+		top: 0;
+		right: 0;
+	}
+
+	.logo-mark .l3 {
+		position: absolute;
+		width: 15px;
+		height: 15px;
+		border-radius: 3px 9px 3px 3px;
+		background: var(--orange);
+		bottom: 0;
+		left: 0;
+		opacity: 0.85;
+	}
+
+	.logo-mark .l4 {
+		position: absolute;
+		width: 15px;
+		height: 15px;
+		border-radius: 9px 3px 3px 3px;
+		background: var(--purple);
+		bottom: 0;
+		right: 0;
+		opacity: 0.85;
+	}
+
+	.nav-links {
+		display: flex;
+		gap: 2rem;
+		list-style: none;
+		align-items: center;
+	}
+
+	.nav-links a {
+		color: var(--muted);
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+	.nav-links a:hover {
+		color: var(--text);
+	}
+
+	.nav-cta {
+		background: var(--green);
+		color: var(--bg) !important;
+		padding: 0.5rem 1.2rem;
+		border-radius: 50px;
+		font-size: 0.85rem;
+		font-weight: 600;
+		font-family: var(--font-head);
+	}
+
+	.nav-cta:hover {
+		background: var(--text);
+		color: var(--bg) !important;
+	}
+
+	.mobile-menu {
+		display: none;
+		background: none;
+		border: none;
+		color: var(--text);
+		cursor: pointer;
+		padding: 4px;
+	}
+
+	.mobile-menu svg {
+		width: 24px;
+		height: 24px;
+	}
+
+	/* ─── Footer ─── */
+	footer {
+		position: relative;
+		z-index: 10;
+		border-top: 1px solid var(--border);
+		padding: 2.5rem 0;
+	}
+
+	.footer-inner {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.8rem;
+		color: var(--dim);
+	}
+
+	.footer-inner a {
+		color: var(--muted);
+	}
+
+	.footer-inner a:hover {
+		color: var(--text);
+	}
+
+	.foot-links {
+		display: flex;
+		gap: 1.5rem;
+		list-style: none;
+	}
+
+	.foot-links a {
+		color: var(--muted);
+		font-size: 0.8rem;
+	}
+
+	/* ─── Responsive ─── */
+	@media (max-width: 768px) {
+		.nav-links {
+			display: none;
+		}
+
+		.mobile-menu {
+			display: block;
+		}
+
+		.footer-inner {
+			flex-direction: column;
+			text-align: center;
+		}
+	}
+</style>

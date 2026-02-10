@@ -1,0 +1,115 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs title="@skill-tools/core">
+	<h1>@skill-tools/core</h1>
+	<p>
+		Core parser, types, and utilities for the skill-tools ecosystem. This is the foundation package that
+		all other tools depend on. Implements the <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent Skills specification</a>.
+	</p>
+
+	<pre><code>npm install @skill-tools/core</code></pre>
+
+	<h2>What it does</h2>
+	<ul>
+		<li><strong>Parses SKILL.md files</strong> &mdash; extracts YAML frontmatter, markdown sections, file references, and token counts</li>
+		<li><strong>Defines shared types</strong> &mdash; <code>Skill</code>, <code>SkillMetadata</code>, <code>Diagnostic</code>, <code>ParseResult</code></li>
+		<li><strong>Counts tokens</strong> &mdash; using tiktoken (cl100k_base encoding, GPT-4o compatible)</li>
+		<li><strong>Resolves skill files</strong> &mdash; finds SKILL.md files in directories and directory trees</li>
+	</ul>
+
+	<h2>API</h2>
+
+	<h3><code>parseSkill(filePath)</code></h3>
+	<p>Reads and parses a SKILL.md file from disk. Returns a discriminated union result.</p>
+	<pre><code>import &#123; parseSkill &#125; from '@skill-tools/core';
+
+const result = await parseSkill('./my-skill/SKILL.md');
+
+if (result.ok) &#123;
+  console.log(result.skill.metadata.name);
+  console.log(result.skill.body);
+  console.log(result.skill.tokenCount);
+&#125; else &#123;
+  console.error(result.diagnostics);
+&#125;</code></pre>
+
+	<h3><code>parseSkillContent(content, filePath, dirPath)</code></h3>
+	<p>Parses SKILL.md from a string. Synchronous. Useful when content is already in memory.</p>
+	<pre><code>import &#123; parseSkillContent &#125; from '@skill-tools/core';
+
+const result = parseSkillContent(rawMarkdown, '/path/SKILL.md', '/path');</code></pre>
+
+	<h3><code>countTokens(text)</code></h3>
+	<p>Returns the token count for a string using the cl100k_base encoding.</p>
+
+	<h3><code>resolveSkillFiles(searchPath)</code></h3>
+	<p>Finds all SKILL.md files in a path. Handles single files, single directories, and parent directories containing multiple skill subdirectories.</p>
+
+	<h2>Validation Rules</h2>
+	<p>The parser enforces the <a href="/docs/specification">Agent Skills specification</a>:</p>
+	<table>
+		<thead>
+			<tr>
+				<th>Rule ID</th>
+				<th>Severity</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>frontmatter-required</code></td>
+				<td>error</td>
+				<td>YAML frontmatter must be present</td>
+			</tr>
+			<tr>
+				<td><code>frontmatter-valid-yaml</code></td>
+				<td>error</td>
+				<td>Frontmatter must be valid YAML</td>
+			</tr>
+			<tr>
+				<td><code>name-required</code></td>
+				<td>error</td>
+				<td>Name field is required</td>
+			</tr>
+			<tr>
+				<td><code>name-format</code></td>
+				<td>error</td>
+				<td>Name must be lowercase alphanumeric + hyphens, 1-64 chars, no consecutive hyphens</td>
+			</tr>
+			<tr>
+				<td><code>description-required</code></td>
+				<td>error</td>
+				<td>Description field is required</td>
+			</tr>
+			<tr>
+				<td><code>description-length</code></td>
+				<td>warn/error</td>
+				<td>Warns if &lt;10 chars, errors if &gt;1024 chars</td>
+			</tr>
+			<tr>
+				<td><code>token-budget</code></td>
+				<td>warning</td>
+				<td>Warns when total tokens exceed 5,000</td>
+			</tr>
+			<tr>
+				<td><code>file-reference-exists</code></td>
+				<td>warning</td>
+				<td>Referenced files should exist on disk</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Security</h2>
+	<ul>
+		<li>Prototype pollution protection on frontmatter keys (<code>__proto__</code>, <code>constructor</code>)</li>
+		<li>Path traversal guard on file references</li>
+	</ul>
+
+	<h2>Dependencies</h2>
+	<ul>
+		<li><code>gray-matter</code> &mdash; YAML frontmatter parsing</li>
+		<li><code>js-tiktoken</code> &mdash; Token counting (cl100k_base encoding)</li>
+	</ul>
+</Docs>

@@ -1,0 +1,117 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs title="Agent Skills Specification">
+	<h1>Agent Skills Specification</h1>
+	<p>
+		The skill-tools ecosystem implements the <strong><a href="https://agentskills.io" target="_blank" rel="noopener">Agent Skills open standard</a></strong> &mdash;
+		a portable, vendor-neutral format for packaging AI agent capabilities as <code>SKILL.md</code> files.
+	</p>
+
+	<blockquote>
+		<p>The full specification is maintained at <a href="https://agentskills.io/specification" target="_blank" rel="noopener">agentskills.io/specification</a>. This page summarizes the key rules our tooling enforces.</p>
+	</blockquote>
+
+	<h2>File Format</h2>
+	<p>A skill is a directory containing a <code>SKILL.md</code> file. The file uses YAML frontmatter delimited by <code>---</code> followed by a Markdown body.</p>
+
+	<pre><code>my-skill/
+  SKILL.md              # Required
+  scripts/              # Optional executable scripts
+  references/           # Optional reference documents
+  assets/               # Optional static files</code></pre>
+
+	<h2>Required Fields</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Field</th>
+				<th>Type</th>
+				<th>Rules</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>name</code></td>
+				<td>string</td>
+				<td>Required. 1-64 chars. Lowercase letters, numbers, hyphens only. No consecutive hyphens. Must match the parent directory name.</td>
+			</tr>
+			<tr>
+				<td><code>description</code></td>
+				<td>string</td>
+				<td>Required. 1-1024 chars. Tells agents <em>when</em> to use this skill. Used for discovery and routing.</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Optional Fields</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Field</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>version</code></td>
+				<td>Semantic version string</td>
+			</tr>
+			<tr>
+				<td><code>license</code></td>
+				<td>SPDX license identifier</td>
+			</tr>
+			<tr>
+				<td><code>compatibility</code></td>
+				<td>Agent compatibility information</td>
+			</tr>
+			<tr>
+				<td><code>metadata</code></td>
+				<td>Structured key-value map for custom fields</td>
+			</tr>
+			<tr>
+				<td><code>user-invocable</code></td>
+				<td>Whether users can trigger this skill directly</td>
+			</tr>
+			<tr>
+				<td><code>allowed-tools</code></td>
+				<td>Comma-separated list of tools the skill can use</td>
+			</tr>
+			<tr>
+				<td><code>context</code></td>
+				<td>Execution context (e.g., <code>fork</code>)</td>
+			</tr>
+			<tr>
+				<td><code>agent</code></td>
+				<td>Agent type for execution</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Progressive Disclosure</h2>
+	<p>Skills follow a three-tier information model:</p>
+	<ol>
+		<li><strong>Metadata</strong> (~100 tokens) &mdash; frontmatter fields for discovery and routing</li>
+		<li><strong>Instructions</strong> (&lt;5,000 tokens) &mdash; the Markdown body injected into agent context</li>
+		<li><strong>Resources</strong> (as needed) &mdash; files in <code>scripts/</code>, <code>references/</code>, and <code>assets/</code></li>
+	</ol>
+
+	<h2>Name Validation</h2>
+	<p>The <code>name</code> field must:</p>
+	<ul>
+		<li>Contain only lowercase letters (<code>a-z</code>), numbers (<code>0-9</code>), and hyphens (<code>-</code>)</li>
+		<li>Be between 1 and 64 characters</li>
+		<li>Not contain consecutive hyphens (<code>--</code>)</li>
+		<li>Match the parent directory name</li>
+	</ul>
+
+	<h2>Links</h2>
+	<ul>
+		<li><a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a> &mdash; Official standard homepage</li>
+		<li><a href="https://agentskills.io/specification" target="_blank" rel="noopener">Full specification</a></li>
+		<li><a href="https://agentskills.io/what-are-skills" target="_blank" rel="noopener">What are Agent Skills?</a></li>
+		<li><a href="https://agentskills.io/integrate-skills" target="_blank" rel="noopener">Integration guide</a></li>
+		<li><a href="https://github.com/agentskills/agentskills/tree/main/skills-ref" target="_blank" rel="noopener">Reference implementation (Python)</a></li>
+	</ul>
+</Docs>

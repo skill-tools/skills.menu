@@ -1,0 +1,411 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description } = Astro.props;
+
+const nav = [
+	{ label: 'Specification', href: '/docs/specification' },
+	{ label: '@skill-tools/core', href: '/docs/core' },
+	{ label: 'skill-tools CLI', href: '/docs/skill-tools' },
+	{ label: 'skillrouter', href: '/docs/skillrouter' },
+	{ label: 'skillgen', href: '/docs/skillgen' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description ?? `${title} — skills.menu documentation`} />
+		<meta name="generator" content={Astro.generator} />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title} — skills.menu</title>
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a href="/" class="logo">
+					<div class="logo-mark">
+						<div class="l1"></div>
+						<div class="l2"></div>
+						<div class="l3"></div>
+						<div class="l4"></div>
+					</div>
+					skills.menu
+				</a>
+				<ul class="nav-links">
+					<li><a href="#">Tools</a></li>
+					<li><a href="/docs/core">Docs</a></li>
+					<li><a href="/docs/specification">Specification</a></li>
+					<li><a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener" class="nav-cta">Get Started</a></li>
+				</ul>
+				<button class="mobile-menu" aria-label="Menu">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+				</button>
+			</nav>
+		</header>
+
+		<div class="docs-layout container">
+			<aside class="sidebar">
+				<div class="sidebar-label">Documentation</div>
+				<nav class="sidebar-nav">
+					{nav.map((item) => (
+						<a
+							href={item.href}
+							class:list={['sidebar-link', { active: currentPath === item.href || currentPath === item.href + '/' }]}
+						>
+							{item.label}
+						</a>
+					))}
+				</nav>
+			</aside>
+
+			<article class="docs-content">
+				<slot />
+			</article>
+		</div>
+
+		<footer>
+			<div class="container footer-inner">
+				<span>Built for <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a></span>
+				<ul class="foot-links">
+					<li><a href="https://agentskills.io/specification" target="_blank" rel="noopener">Specification</a></li>
+					<li><a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener">GitHub</a></li>
+					<li><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">Reference</a></li>
+				</ul>
+			</div>
+		</footer>
+	</body>
+</html>
+
+<style>
+	/* ─── Header ─── */
+	header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 200;
+		padding: 1.1rem 0;
+		background: rgba(0, 0, 0, 0.85);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+	}
+
+	header nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		max-width: var(--max-w);
+		margin: 0 auto;
+		padding: 0 2rem;
+	}
+
+	.logo {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		font-family: var(--font-head);
+		font-weight: 700;
+		font-size: 1.15rem;
+		color: var(--text);
+	}
+
+	.logo:hover { color: var(--green); }
+
+	.logo-mark {
+		width: 34px;
+		height: 34px;
+		position: relative;
+	}
+
+	.logo-mark .l1 { position: absolute; width: 15px; height: 15px; border-radius: 3px 3px 3px 9px; background: var(--green); top: 0; left: 0; }
+	.logo-mark .l2 { position: absolute; width: 15px; height: 15px; border-radius: 3px 3px 9px 3px; background: var(--pink); top: 0; right: 0; }
+	.logo-mark .l3 { position: absolute; width: 15px; height: 15px; border-radius: 3px 9px 3px 3px; background: var(--orange); bottom: 0; left: 0; opacity: 0.85; }
+	.logo-mark .l4 { position: absolute; width: 15px; height: 15px; border-radius: 9px 3px 3px 3px; background: var(--purple); bottom: 0; right: 0; opacity: 0.85; }
+
+	.nav-links {
+		display: flex;
+		gap: 2rem;
+		list-style: none;
+		align-items: center;
+	}
+
+	.nav-links a {
+		color: var(--muted);
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+	.nav-links a:hover { color: var(--text); }
+
+	.nav-cta {
+		background: var(--green);
+		color: var(--bg) !important;
+		padding: 0.5rem 1.2rem;
+		border-radius: 50px;
+		font-size: 0.85rem;
+		font-weight: 600;
+		font-family: var(--font-head);
+	}
+
+	.nav-cta:hover { background: var(--text); color: var(--bg) !important; }
+
+	.mobile-menu {
+		display: none;
+		background: none;
+		border: none;
+		color: var(--text);
+		cursor: pointer;
+		padding: 4px;
+	}
+
+	.mobile-menu svg { width: 24px; height: 24px; }
+
+	/* ─── Docs Layout ─── */
+	.docs-layout {
+		display: grid;
+		grid-template-columns: 220px 1fr;
+		gap: 3rem;
+		padding-top: 6rem;
+		padding-bottom: 4rem;
+		min-height: 100vh;
+	}
+
+	/* ─── Sidebar ─── */
+	.sidebar {
+		position: sticky;
+		top: 5rem;
+		align-self: start;
+	}
+
+	.sidebar-label {
+		font-family: var(--font-mono);
+		font-size: 0.62rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--dim);
+		margin-bottom: 0.75rem;
+		padding-left: 0.75rem;
+	}
+
+	.sidebar-nav {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.sidebar-link {
+		display: block;
+		padding: 0.5rem 0.75rem;
+		border-radius: 8px;
+		font-size: 0.85rem;
+		color: var(--muted);
+		transition: all 0.15s ease;
+	}
+
+	.sidebar-link:hover {
+		color: var(--text);
+		background: var(--bg2);
+	}
+
+	.sidebar-link.active {
+		color: var(--green);
+		background: rgba(62, 207, 142, 0.06);
+	}
+
+	/* ─── Docs Content ─── */
+	.docs-content {
+		max-width: 760px;
+		line-height: 1.7;
+	}
+
+	.docs-content :global(h1) {
+		font-family: var(--font-head);
+		font-size: clamp(1.75rem, 3vw, 2.25rem);
+		margin-bottom: 0.75rem;
+		letter-spacing: -0.03em;
+	}
+
+	.docs-content :global(h2) {
+		font-family: var(--font-head);
+		font-size: 1.3rem;
+		margin-top: 3rem;
+		margin-bottom: 1rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid var(--border);
+		letter-spacing: -0.02em;
+	}
+
+	.docs-content :global(h3) {
+		font-family: var(--font-head);
+		font-size: 1.05rem;
+		margin-top: 2rem;
+		margin-bottom: 0.75rem;
+		letter-spacing: -0.01em;
+	}
+
+	.docs-content :global(p) {
+		margin-bottom: 1rem;
+		color: var(--muted);
+	}
+
+	.docs-content :global(a) {
+		color: var(--green);
+	}
+
+	.docs-content :global(a:hover) {
+		text-decoration: underline;
+	}
+
+	.docs-content :global(strong) {
+		color: var(--text);
+		font-weight: 600;
+	}
+
+	.docs-content :global(ul),
+	.docs-content :global(ol) {
+		margin-bottom: 1rem;
+		padding-left: 1.5rem;
+		color: var(--muted);
+	}
+
+	.docs-content :global(li) {
+		margin-bottom: 0.4rem;
+	}
+
+	.docs-content :global(pre) {
+		background: #030303;
+		border: 1px solid var(--border2);
+		border-radius: 10px;
+		padding: 1rem 1.25rem;
+		margin-bottom: 1.5rem;
+		overflow-x: auto;
+		font-size: 0.82rem;
+		line-height: 1.7;
+	}
+
+	.docs-content :global(code) {
+		font-family: var(--font-mono);
+	}
+
+	.docs-content :global(table) {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 1.5rem;
+		font-size: 0.85rem;
+	}
+
+	.docs-content :global(th) {
+		text-align: left;
+		padding: 0.6rem 0.75rem;
+		border-bottom: 2px solid var(--border2);
+		color: var(--text);
+		font-weight: 600;
+		font-family: var(--font-head);
+		font-size: 0.78rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.docs-content :global(td) {
+		padding: 0.5rem 0.75rem;
+		border-bottom: 1px solid var(--border);
+		color: var(--muted);
+	}
+
+	.docs-content :global(blockquote) {
+		border-left: 3px solid var(--green);
+		padding: 0.75rem 1rem;
+		margin-bottom: 1rem;
+		background: var(--bg2);
+		border-radius: 0 8px 8px 0;
+	}
+
+	.docs-content :global(blockquote p) {
+		margin-bottom: 0;
+	}
+
+	.docs-content :global(em) {
+		color: var(--muted);
+	}
+
+	/* ─── Footer ─── */
+	footer {
+		position: relative;
+		z-index: 10;
+		border-top: 1px solid var(--border);
+		padding: 2.5rem 0;
+	}
+
+	.footer-inner {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.8rem;
+		color: var(--dim);
+	}
+
+	.footer-inner a { color: var(--muted); }
+	.footer-inner a:hover { color: var(--text); }
+
+	.foot-links {
+		display: flex;
+		gap: 1.5rem;
+		list-style: none;
+	}
+
+	.foot-links a {
+		color: var(--muted);
+		font-size: 0.8rem;
+	}
+
+	/* ─── Responsive ─── */
+	@media (max-width: 768px) {
+		.nav-links { display: none; }
+		.mobile-menu { display: block; }
+
+		.docs-layout {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+			padding-top: 5rem;
+		}
+
+		.sidebar { position: static; }
+
+		.sidebar-nav {
+			flex-direction: row;
+			overflow-x: auto;
+			gap: 0.35rem;
+			padding-bottom: 0.5rem;
+		}
+
+		.sidebar-link { white-space: nowrap; font-size: 0.8rem; }
+
+		.sidebar-label { display: none; }
+
+		.footer-inner {
+			flex-direction: column;
+			text-align: center;
+		}
+	}
+</style>

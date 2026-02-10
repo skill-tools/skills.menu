@@ -1,0 +1,139 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs title="skill-tools CLI">
+	<h1>skill-tools CLI</h1>
+	<p>
+		CLI tool and library for validating, linting, and quality-scoring Agent Skills per the
+		<a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent Skills specification</a>.
+		The ESLint/Lighthouse equivalent for agent skills.
+	</p>
+
+	<pre><code>npm install -g skill-tools</code></pre>
+
+	<h2>Commands</h2>
+
+	<h3><code>skill-tools validate &lt;path&gt;</code></h3>
+	<p>Checks SKILL.md files against the specification. Reports errors and warnings.</p>
+	<pre><code>skill-tools validate ./my-skill/
+skill-tools validate ./skills/ --format json</code></pre>
+
+	<h3><code>skill-tools lint &lt;path&gt;</code></h3>
+	<p>Runs quality lint rules beyond basic spec compliance.</p>
+	<pre><code>skill-tools lint ./my-skill/
+skill-tools lint ./my-skill/ --fail-on warning</code></pre>
+
+	<h3><code>skill-tools score &lt;path&gt;</code></h3>
+	<p>Computes a quality score (0-100) with dimension breakdowns and improvement suggestions.</p>
+	<pre><code>skill-tools score ./my-skill/
+skill-tools score ./my-skill/ --min-score 60</code></pre>
+
+	<h3><code>skill-tools check &lt;path&gt;</code></h3>
+	<p>Runs validate + lint + score in one pass. Ideal for CI/CD.</p>
+
+	<h2>Lint Rules</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Rule</th>
+				<th>Default</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>description-specificity</code></td>
+				<td>warn</td>
+				<td>No generic verbs ("manage", "handle")</td>
+			</tr>
+			<tr>
+				<td><code>description-trigger-keywords</code></td>
+				<td>warn</td>
+				<td>Has action verbs or "Use when..."</td>
+			</tr>
+			<tr>
+				<td><code>progressive-disclosure</code></td>
+				<td>warn</td>
+				<td>Large files use <code>references/</code></td>
+			</tr>
+			<tr>
+				<td><code>no-hardcoded-paths</code></td>
+				<td>error</td>
+				<td>No <code>/Users/...</code> or <code>C:\</code> paths</td>
+			</tr>
+			<tr>
+				<td><code>no-secrets</code></td>
+				<td>error</td>
+				<td>No API keys, tokens, private keys</td>
+			</tr>
+			<tr>
+				<td><code>instructions-has-examples</code></td>
+				<td>info</td>
+				<td>Has code blocks or numbered steps</td>
+			</tr>
+			<tr>
+				<td><code>instructions-has-error-handling</code></td>
+				<td>info</td>
+				<td>Mentions error handling</td>
+			</tr>
+			<tr>
+				<td><code>consistent-headings</code></td>
+				<td>info</td>
+				<td>No skipping heading levels</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Score Dimensions</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Dimension</th>
+				<th>Points</th>
+				<th>Key Factors</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Description Quality</td>
+				<td>30</td>
+				<td>Length, specificity, trigger context, uniqueness</td>
+			</tr>
+			<tr>
+				<td>Instruction Clarity</td>
+				<td>25</td>
+				<td>Code blocks, steps, error handling, substance</td>
+			</tr>
+			<tr>
+				<td>Spec Compliance</td>
+				<td>20</td>
+				<td>Name, description, tokens, lines</td>
+			</tr>
+			<tr>
+				<td>Progressive Disclosure</td>
+				<td>15</td>
+				<td>File size, use of references/scripts</td>
+			</tr>
+			<tr>
+				<td>Security</td>
+				<td>10</td>
+				<td>No secrets, no hardcoded paths</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Library API</h2>
+	<pre><code>import &#123; validate, lint, score &#125; from 'skill-tools';
+
+const results = await validate('./my-skill/');
+const lintResult = lint(parsedSkill);
+const qualityScore = score(parsedSkill);</code></pre>
+
+	<h2>GitHub Action</h2>
+	<p>Use the skill-tools GitHub Action to validate skills in CI:</p>
+	<pre><code>- uses: skill-tools/skill-tools/action@main
+  with:
+    path: ./skills/
+    min-score: 60</code></pre>
+</Docs>

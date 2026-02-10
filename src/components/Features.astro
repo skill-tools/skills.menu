@@ -1,0 +1,84 @@
+---
+---
+
+<section class="packages">
+<div class="container">
+	<div class="section-head">
+		<h2>The ecosystem.</h2>
+		<p>Four tools that cover the full skill lifecycle.</p>
+	</div>
+	<div class="pkg-grid">
+		<div class="pkg">
+			<div class="pkg-accent"></div>
+			<div class="pkg-num">01 — FOUNDATION</div>
+			<h3><span class="scope">@skill-tools/</span>core</h3>
+			<p>Parse SKILL.md files, extract YAML frontmatter, count tokens, resolve file references. Every other package depends on this.</p>
+			<div class="pkg-tags"><span class="ptag">parser</span><span class="ptag">types</span><span class="ptag">tokenizer</span><span class="ptag">resolver</span></div>
+			<div class="pkg-note"><em>@skill-tools/</em> scope — the shared foundation under the skill-tools npm org</div>
+		</div>
+		<div class="pkg">
+			<div class="pkg-accent"></div>
+			<div class="pkg-num">02 — QUALITY</div>
+			<h3>skill-tools</h3>
+			<p>The ESLint for agent skills. Validate against the spec, lint for quality issues, score 0&#8209;100 across five dimensions.</p>
+			<div class="pkg-tags"><span class="ptag">CLI</span><span class="ptag">validate</span><span class="ptag">lint</span><span class="ptag">score</span></div>
+		</div>
+		<div class="pkg">
+			<div class="pkg-accent"></div>
+			<div class="pkg-num">03 — ROUTING</div>
+			<h3>skillrouter</h3>
+			<p>Semantic skill selection via TF-IDF embeddings + cosine similarity. Find the right skill from thousands — zero external dependencies.</p>
+			<div class="pkg-tags"><span class="ptag">embeddings</span><span class="ptag">routing</span><span class="ptag">search</span><span class="ptag">vector</span></div>
+		</div>
+		<div class="pkg">
+			<div class="pkg-accent"></div>
+			<div class="pkg-num">04 — GENERATION</div>
+			<h3>skillgen</h3>
+			<p>OpenAPI 3.x in, SKILL.md out. Unified or per-endpoint modes. Auth detection, curl examples, error handling baked in.</p>
+			<div class="pkg-tags"><span class="ptag">OpenAPI</span><span class="ptag">generator</span><span class="ptag">CLI</span></div>
+		</div>
+	</div>
+</div>
+</section>
+
+<style>
+	.packages { position: relative; z-index: 10; padding: 6rem 0; }
+
+	.section-head { text-align: center; margin-bottom: 4rem; }
+	.section-head h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 0.5rem; }
+	.section-head p { color: var(--muted); font-size: 1rem; }
+
+	.pkg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+
+	.pkg {
+		background: var(--bg2);
+		border: 1px solid var(--border);
+		border-radius: 14px;
+		padding: 1.75rem;
+		transition: all 0.3s;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.pkg:hover { border-color: var(--border2); transform: translateY(-3px); }
+
+	.pkg-accent { position: absolute; top: -1px; left: 1.5rem; right: 1.5rem; height: 2px; border-radius: 0 0 2px 2px; }
+	.pkg:nth-child(1) .pkg-accent { background: var(--green); }
+	.pkg:nth-child(2) .pkg-accent { background: var(--pink); }
+	.pkg:nth-child(3) .pkg-accent { background: var(--orange); }
+	.pkg:nth-child(4) .pkg-accent { background: var(--purple); }
+
+	.pkg-num { font-family: var(--font-mono); font-size: 0.65rem; color: var(--dim); margin-bottom: 0.75rem; letter-spacing: 0.06em; }
+	.pkg h3 { font-size: 1.15rem; margin-bottom: 0.5rem; font-weight: 600; }
+	.pkg h3 .scope { color: var(--dim); font-weight: 400; font-size: 0.9em; }
+	.pkg p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+	.pkg-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 1rem; }
+	.ptag { font-family: var(--font-mono); font-size: 0.62rem; padding: 0.2em 0.55em; border-radius: 50px; background: rgba(255,255,255,0.03); color: var(--dim); border: 1px solid var(--border); }
+
+	.pkg-note { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+	.pkg-note em { color: var(--green); font-style: normal; }
+
+	@media (max-width: 900px) { .pkg-grid { grid-template-columns: 1fr; } }
+	@media (max-width: 768px) { .packages { padding: 4rem 0; } }
+</style>

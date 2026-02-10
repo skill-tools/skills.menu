@@ -1,0 +1,126 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs title="skillgen">
+	<h1>skillgen</h1>
+	<p>
+		Generate <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent Skills</a> (SKILL.md)
+		from OpenAPI 3.x specifications or plain text descriptions. Outputs spec-compliant files ready for validation with <code>skill-tools</code>.
+	</p>
+
+	<pre><code>npm install -g skillgen</code></pre>
+
+	<h2>CLI Usage</h2>
+
+	<h3>From OpenAPI spec</h3>
+	<pre><code># Unified mode (one SKILL.md per API)
+skillgen openapi ./petstore.json
+
+# Per-endpoint mode (one SKILL.md per operation)
+skillgen openapi ./api.yaml --mode per-endpoint --out ./skills/
+
+# With options
+skillgen openapi ./spec.json --name my-api --no-examples --max-tokens 3000</code></pre>
+
+	<h3>From text description</h3>
+	<pre><code># Basic
+skillgen from-text deploy-vercel "Deploy apps to Vercel"
+
+# With instructions
+skillgen from-text run-tests "Execute test suites" \
+  --instructions "1. Run npm test\n2. Check coverage"</code></pre>
+
+	<h2>Library API</h2>
+
+	<h3><code>generateFromOpenApi(specPath, options?)</code></h3>
+	<p>Reads an OpenAPI spec, parses it, and generates SKILL.md files.</p>
+	<pre><code>import &#123; generateFromOpenApi &#125; from 'skillgen';
+
+const result = await generateFromOpenApi('./petstore.json', &#123;
+  mode: 'unified',
+  maxTokens: 4000,
+&#125;);
+
+if (result.ok) &#123;
+  for (const [path, content] of result.files) &#123;
+    console.log(path, content.length);
+  &#125;
+&#125;</code></pre>
+
+	<h3><code>generateFromSpec(spec, options?)</code></h3>
+	<p>Generate from a pre-parsed <code>ApiSpec</code>. Useful for programmatic pipelines.</p>
+
+	<h3><code>generateFromText(name, description, instructions?)</code></h3>
+	<p>Lightweight generator for simple skills without an API spec.</p>
+
+	<h3><code>parseOpenApi(content)</code></h3>
+	<p>Parse an OpenAPI 3.x document (JSON or YAML string) into the intermediate <code>ApiSpec</code> representation.</p>
+
+	<h3><code>renderSkillMd(spec, options?)</code></h3>
+	<p>Render SKILL.md content from an <code>ApiSpec</code>. Returns a <code>Map&lt;filePath, content&gt;</code>.</p>
+
+	<h2>Generation Options</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Option</th>
+				<th>Default</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>name</code></td>
+				<td>derived from spec title</td>
+				<td>Skill name override (kebab-case)</td>
+			</tr>
+			<tr>
+				<td><code>outDir</code></td>
+				<td><code>.</code></td>
+				<td>Output directory</td>
+			</tr>
+			<tr>
+				<td><code>mode</code></td>
+				<td><code>unified</code></td>
+				<td><code>unified</code> or <code>per-endpoint</code></td>
+			</tr>
+			<tr>
+				<td><code>maxTokens</code></td>
+				<td><code>4000</code></td>
+				<td>Token budget (warns if exceeded)</td>
+			</tr>
+			<tr>
+				<td><code>includeExamples</code></td>
+				<td><code>true</code></td>
+				<td>Include curl examples</td>
+			</tr>
+			<tr>
+				<td><code>includeErrorHandling</code></td>
+				<td><code>true</code></td>
+				<td>Include error handling section</td>
+			</tr>
+			<tr>
+				<td><code>description</code></td>
+				<td>derived from spec</td>
+				<td>Custom description override</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Supported Specs</h2>
+	<ul>
+		<li>OpenAPI 3.0.x and 3.1.x (JSON or YAML)</li>
+		<li>Local <code>$ref</code> resolution (components only)</li>
+		<li>Auth schemes: API key, Bearer, Basic, OAuth2</li>
+		<li>Parameters: path, query, header</li>
+		<li>Request/response bodies with schema introspection</li>
+	</ul>
+
+	<h2>Security</h2>
+	<ul>
+		<li>Path traversal prevention on output file paths</li>
+		<li>10MB input size limit on spec files</li>
+		<li>Input validation on CLI arguments</li>
+	</ul>
+</Docs>

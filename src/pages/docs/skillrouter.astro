@@ -1,0 +1,130 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs title="skillrouter">
+	<h1>skillrouter</h1>
+	<p>
+		Semantic skill selection middleware for <a href="https://agentskills.io" target="_blank" rel="noopener">Agent Skills</a>.
+		Uses embedding-based routing to select which skills to inject into an agent's context window from large skill catalogs.
+		Zero external dependencies &mdash; built-in TF-IDF embeddings.
+	</p>
+
+	<pre><code>npm install skillrouter</code></pre>
+
+	<h2>Quick Start</h2>
+	<pre><code>import &#123; SkillRouter &#125; from 'skillrouter';
+
+const router = new SkillRouter();
+
+await router.indexSkills([
+  &#123; name: 'deploy-vercel', description: 'Deploy apps to Vercel...' &#125;,
+  &#123; name: 'run-tests', description: 'Execute test suites...' &#125;,
+  &#123; name: 'lint-code', description: 'Run ESLint or Biome...' &#125;,
+]);
+
+const results = await router.select('deploy my app');
+// [&#123; skill: 'deploy-vercel', score: 0.87, metadata: &#123;...&#125; &#125;]</code></pre>
+
+	<h2>API</h2>
+
+	<h3><code>SkillRouter</code></h3>
+	<p>Main class. Constructor accepts optional <code>SkillRouterOptions</code> with embedding config.</p>
+
+	<h3><code>indexSkills(skills)</code></h3>
+	<p>Embed and store skill descriptions. Builds TF-IDF vocabulary from the corpus.</p>
+
+	<h3><code>indexDirectory(dirPath)</code></h3>
+	<p>Auto-discover and index SKILL.md files in a directory.</p>
+
+	<h3><code>select(query, options?)</code></h3>
+	<p>Find the top-K most relevant skills for a natural language query.</p>
+	<table>
+		<thead>
+			<tr>
+				<th>Option</th>
+				<th>Default</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>topK</code></td>
+				<td>5</td>
+				<td>Number of results</td>
+			</tr>
+			<tr>
+				<td><code>threshold</code></td>
+				<td>0.0</td>
+				<td>Minimum cosine similarity score</td>
+			</tr>
+			<tr>
+				<td><code>boost</code></td>
+				<td>&mdash;</td>
+				<td>Skill names to boost by 1.2x</td>
+			</tr>
+			<tr>
+				<td><code>exclude</code></td>
+				<td>&mdash;</td>
+				<td>Skill names or wildcard patterns to exclude</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h3><code>detectConflicts(threshold?)</code></h3>
+	<p>Find skills with highly similar descriptions that may conflict.</p>
+
+	<h3><code>save() / load(snapshot)</code></h3>
+	<p>Serialize/restore the full index as JSON. Useful for persistence.</p>
+
+	<h3><code>SkillRouter.fromSnapshot(snapshot)</code></h3>
+	<p>Static factory to restore from a serialized snapshot.</p>
+
+	<h2>Embedding Providers</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Provider</th>
+				<th>Status</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>'local'</code></td>
+				<td>Built-in</td>
+				<td>TF-IDF + FNV-1a hash, 256 dimensions, zero dependencies</td>
+			</tr>
+			<tr>
+				<td><code>'custom'</code></td>
+				<td>Supported</td>
+				<td>Bring your own embedding function</td>
+			</tr>
+			<tr>
+				<td><code>'openai'</code></td>
+				<td>Planned</td>
+				<td>OpenAI embeddings API</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h3>Custom Provider</h3>
+	<pre><code>const router = new SkillRouter(&#123;
+  embedding: &#123;
+    provider: 'custom',
+    dimensions: 1536,
+    embed: async (texts) =&gt; &#123;
+      // Call your embedding API here
+      return texts.map(t =&gt; myEmbedFunction(t));
+    &#125;,
+  &#125;,
+&#125;);</code></pre>
+
+	<h2>Architecture</h2>
+	<ul>
+		<li><code>indexSkills()</code> calls <code>buildVocabulary()</code> on the local provider before embedding, ensuring TF-IDF values are computed from the full corpus</li>
+		<li><code>select()</code> fetches <code>topK * 2</code> results from the vector store, applies exclude/boost, then trims to <code>topK</code></li>
+		<li>Snapshot format is versioned (<code>version: 1</code>) with dimension validation on load</li>
+		<li><code>MemoryVectorStore</code> uses brute-force cosine similarity &mdash; suitable for &lt;1,000 skills</li>
+	</ul>
+</Docs>

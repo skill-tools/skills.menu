@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 2 — Clean Light</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f8f9fa;--bg3:#f1f3f5;--border:#e9ecef;--border2:#dee2e6;
+  --text:#212529;--muted:#868e96;--dim:#adb5bd;
+  --accent:#228be6;--accent-light:#e7f5ff;--accent-dark:#1971c2;
+  --green:#2b8a3e;--red:#e03131;
+  --font-sans:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --max-w:1100px;
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--accent-dark)}
+code{font-family:var(--font-mono);background:var(--bg3);padding:.15em .4em;border-radius:4px;font-size:.875em;color:var(--accent-dark)}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 1.5rem}
+
+header{border-bottom:1px solid var(--border);padding:1rem 0;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:var(--max-w);margin:0 auto;padding:0 1.5rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-family:var(--font-mono);font-weight:700;font-size:1.1rem;color:var(--text)}
+.logo:hover{color:var(--accent)}
+.logo svg{width:28px;height:28px}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center}
+.nav-links a{color:var(--muted);font-size:.9rem;font-weight:500}
+.nav-links a:hover{color:var(--text)}
+
+.hero{padding:6rem 0 4rem;text-align:center}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.8rem;color:var(--accent);background:var(--accent-light);padding:.35em .9em;border-radius:20px;margin-bottom:2rem;font-weight:500}
+.hero h1{font-size:clamp(2.5rem,6vw,3.75rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:1.25rem;color:var(--text)}
+.hero h1 .hl{background:linear-gradient(135deg,#228be6,#7048e8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:520px;margin:0 auto 2.5rem;line-height:1.7}
+.hero-actions{display:flex;gap:1rem;justify-content:center;margin-bottom:3.5rem}
+.btn{padding:.7rem 1.5rem;border-radius:8px;font-size:.9rem;font-weight:600;border:1px solid transparent;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff}
+.btn-ghost{border-color:var(--border2);color:var(--text);background:transparent}
+.btn-ghost:hover{border-color:var(--muted);background:var(--bg2)}
+
+.terminal-wrap{max-width:620px;margin:0 auto}
+.terminal{background:#1e1e2e;border:1px solid #313244;border-radius:12px;overflow:hidden;text-align:left;box-shadow:0 20px 60px rgba(0,0,0,.12)}
+.terminal-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;background:#181825;border-bottom:1px solid #313244}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#f38ba8}.dot-y{background:#f9e2af}.dot-g{background:#a6e3a1}
+.terminal-title{font-family:var(--font-mono);font-size:.7rem;color:#6c7086;margin-left:.5rem}
+.terminal pre{margin:0;padding:1.25rem;font-size:.82rem;line-height:1.8;background:transparent;border:none;color:#cdd6f4}
+.terminal .prompt{color:#a6e3a1}.terminal .cmt{color:#6c7086}
+
+.features{padding:5rem 0;background:var(--bg2)}
+.features h2{text-align:center;font-size:1.75rem;margin-bottom:.5rem;font-weight:700}
+.features .sub{text-align:center;color:var(--muted);margin-bottom:3rem;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1.75rem;transition:all .2s}
+.card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(34,139,230,.08);transform:translateY(-2px)}
+.card-num{font-family:var(--font-mono);font-size:.75rem;color:var(--accent);margin-bottom:.75rem;font-weight:600}
+.card h3{font-family:var(--font-mono);font-size:1.05rem;margin-bottom:.5rem;font-weight:600}
+.card p{font-size:.875rem;color:var(--muted);line-height:1.6}
+.tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1rem}
+.tag{font-family:var(--font-mono);font-size:.65rem;padding:.2em .55em;border-radius:4px;background:var(--accent-light);color:var(--accent-dark);font-weight:500}
+
+.preview{padding:5rem 0}
+.preview h2{text-align:center;margin-bottom:.5rem;font-size:1.75rem;font-weight:700}
+.preview .sub{text-align:center;color:var(--muted);margin-bottom:3rem}
+.preview-grid{display:grid;grid-template-columns:1fr 280px;gap:2rem;align-items:start}
+.anno{display:flex;flex-direction:column;gap:1rem}
+.anno-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+.anno-label{font-family:var(--font-mono);font-size:.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;font-weight:600}
+.anno-item p{font-size:.82rem;color:var(--muted);line-height:1.5}
+.hl-d{color:#6c7086}.hl-k{color:#89b4fa}.hl-v{color:#cdd6f4}.hl-s{color:#a6e3a1}.hl-h{color:#cdd6f4;font-weight:600}.hl-h2{color:#bac2de;font-weight:500}.hl-c{color:#f9e2af}
+
+.cta{padding:3rem 0}
+.cta-box{background:linear-gradient(135deg,#e7f5ff,#f3f0ff);border:1px solid var(--border);border-radius:16px;padding:3.5rem;text-align:center}
+.cta-box h2{margin-bottom:1rem;font-size:1.5rem;font-weight:700}
+.cta-box p{color:var(--muted);max-width:500px;margin:0 auto 2rem;line-height:1.7}
+.cta-links{display:flex;gap:1rem;justify-content:center}
+
+footer{border-top:1px solid var(--border);padding:2rem 0;margin-top:4rem}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;max-width:var(--max-w);margin:0 auto;padding:0 1.5rem;font-size:.8rem;color:var(--dim)}
+.footer-links{display:flex;gap:1.5rem;list-style:none}
+.footer-links a{color:var(--muted);font-size:.8rem}
+
+@media(max-width:768px){.grid,.preview-grid{grid-template-columns:1fr}.hero-actions,.cta-links{flex-direction:column;align-items:center}.features{padding:3rem 0}}
+</style>
+</head>
+<body>
+
+<header>
+<nav class="container">
+  <a href="#" class="logo">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="28" height="28" rx="7" fill="#228be6"/>
+      <path d="M8 10l3.5 4L8 18" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="14" y1="18" x2="20" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    skills.menu
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">Spec</a></li>
+    <li><a href="#">GitHub</a></li>
+  </ul>
+</nav>
+</header>
+
+<section class="hero">
+<div class="container">
+  <div class="hero-tag">v0.1.0 &mdash; Agent Skills Standard</div>
+  <h1><span class="hl">Tooling</span> for<br>Agent Skills</h1>
+  <p>Validate, lint, score, route, and generate <code>SKILL.md</code> files. Open-source. Zero LLM dependencies.</p>
+  <div class="hero-actions">
+    <a href="#" class="btn btn-primary">View on GitHub</a>
+    <a href="#" class="btn btn-ghost">Read the Docs</a>
+  </div>
+  <div class="terminal-wrap">
+    <div class="terminal">
+      <div class="terminal-bar"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="terminal-title">terminal</span></div>
+      <pre><code><span class="prompt">$</span> npm install @skillkit/core       <span class="cmt"># parser &amp; types</span>
+<span class="prompt">$</span> npm install -g skillkit           <span class="cmt"># CLI validator</span>
+<span class="prompt">$</span> npm install skillrouter           <span class="cmt"># semantic routing</span>
+<span class="prompt">$</span> npm install -g skillgen           <span class="cmt"># OpenAPI generator</span></code></pre>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="features">
+<div class="container">
+  <h2>Four tools, one ecosystem</h2>
+  <p class="sub">Everything you need to build, validate, and deploy agent skills at scale.</p>
+  <div class="grid">
+    <div class="card"><div class="card-num">01</div><h3>@skillkit/core</h3><p>Parse SKILL.md files, extract metadata, count tokens, resolve file references. The foundation.</p><div class="tags"><span class="tag">parser</span><span class="tag">types</span><span class="tag">tokenizer</span></div></div>
+    <div class="card"><div class="card-num">02</div><h3>skillkit</h3><p>CLI for validating, linting, and quality-scoring skills. 8 lint rules, 5 scoring dimensions.</p><div class="tags"><span class="tag">CLI</span><span class="tag">validate</span><span class="tag">lint</span><span class="tag">score</span></div></div>
+    <div class="card"><div class="card-num">03</div><h3>skillrouter</h3><p>Semantic skill selection using TF-IDF embeddings. Zero external dependencies.</p><div class="tags"><span class="tag">embeddings</span><span class="tag">routing</span><span class="tag">search</span></div></div>
+    <div class="card"><div class="card-num">04</div><h3>skillgen</h3><p>Generate SKILL.md from OpenAPI 3.x specs or plain text. Unified or per-endpoint.</p><div class="tags"><span class="tag">OpenAPI</span><span class="tag">generator</span><span class="tag">CLI</span></div></div>
+  </div>
+</div>
+</section>
+
+<section class="preview">
+<div class="container">
+  <h2>What's a SKILL.md?</h2>
+  <p class="sub">A portable format for AI agent instructions. YAML frontmatter + Markdown body.</p>
+  <div class="preview-grid">
+    <div class="terminal">
+      <div class="terminal-bar"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="terminal-title">deploy-vercel/SKILL.md</span></div>
+      <pre><code><span class="hl-d">---</span>
+<span class="hl-k">name:</span> <span class="hl-v">deploy-vercel</span>
+<span class="hl-k">description:</span> <span class="hl-s">Deploy web apps to Vercel.</span>
+<span class="hl-k">version:</span> <span class="hl-v">1.0.0</span>
+<span class="hl-d">---</span>
+
+<span class="hl-h"># Deploy to Vercel</span>
+
+<span class="hl-h2">## Prerequisites</span>
+- Vercel CLI installed (<span class="hl-c">`npm i -g vercel`</span>)
+
+<span class="hl-h2">## Steps</span>
+1. Run <span class="hl-c">`vercel --prod`</span>
+2. Verify deployment URL
+3. Report live URL to user</code></pre>
+    </div>
+    <div class="anno">
+      <div class="anno-item"><div class="anno-label">frontmatter</div><p>YAML metadata for discovery. Name must match directory.</p></div>
+      <div class="anno-item"><div class="anno-label">description</div><p>Tells agents when to use this skill. Used for routing.</p></div>
+      <div class="anno-item"><div class="anno-label">body</div><p>Markdown instructions. Keep under 5,000 tokens.</p></div>
+      <div class="anno-item"><div class="anno-label">resources</div><p>Reference scripts/, references/, assets/ for progressive disclosure.</p></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="cta">
+<div class="container">
+  <div class="cta-box">
+    <h2>Built on an open standard</h2>
+    <p>Implements the Agent Skills specification at agentskills.io &mdash; a portable, vendor-neutral format for AI agent capabilities.</p>
+    <div class="cta-links">
+      <a href="#" class="btn btn-primary">Read the Spec</a>
+      <a href="#" class="btn btn-ghost">Reference Library</a>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+<div class="footer-inner container">
+  <span>Built for the Agent Skills open standard</span>
+  <ul class="footer-links"><li><a href="#">Specification</a></li><li><a href="#">Source</a></li></ul>
+</div>
+</footer>
+</body>
+</html>
