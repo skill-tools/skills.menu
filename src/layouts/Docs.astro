@@ -10,6 +10,7 @@ interface Props {
 const { title, description } = Astro.props;
 
 const nav = [
+	{ label: 'Live Demo', href: '/demo' },
 	{ label: 'Specification', href: '/docs/specification' },
 	{ label: '@skill-tools/core', href: '/docs/core' },
 	{ label: 'skill-tools CLI', href: '/docs/skill-tools' },
@@ -46,6 +47,7 @@ const currentPath = Astro.url.pathname;
 					skills.menu
 				</a>
 				<nav class="nav-links">
+					<a href="/demo">Demo</a>
 					<a href="/docs/core">Docs</a>
 					<a href="/docs/specification">Specification</a>
 					<a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener">GitHub</a>

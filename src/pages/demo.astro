@@ -1,0 +1,968 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/demo-data.json';
+
+const { summary, parse, validation, lint, scores, routing, conflicts } = data;
+
+// Helper to get source badge color class
+function sourceClass(source: string): string {
+	if (source.includes('anthropic')) return 'src-anthropic';
+	if (source.includes('openai')) return 'src-openai';
+	return 'src-vercel';
+}
+
+// Helper to get score color
+function scoreColor(s: number): string {
+	if (s >= 85) return 'var(--green)';
+	if (s >= 70) return 'var(--blue)';
+	if (s >= 55) return 'var(--orange)';
+	return 'var(--red, #dc2626)';
+}
+---
+
+<Base title="Live Demo — skills.menu" description="Real-world analysis of 53 agent skills from Anthropic, OpenAI, and Vercel — parsed, validated, linted, scored, and routed with skill-tools.">
+	<div class="demo-page">
+	<h1>Live Demo</h1>
+	<p>
+		Real-world analysis of <strong>{summary.totalSkills} agent skills</strong> from three public repositories,
+		processed through the full <code>skill-tools</code> pipeline.
+	</p>
+
+	<div class="source-badges">
+		{data.sources.map((s) => (
+			<a href={`https://github.com/${s}`} target="_blank" rel="noopener" class={`source-badge ${sourceClass(s)}`}>
+				{s}
+			</a>
+		))}
+	</div>
+
+	<!-- Summary Stats -->
+	<div class="stats-grid">
+		<div class="stat-card">
+			<div class="stat-value">{summary.totalSkills}</div>
+			<div class="stat-label">Skills Found</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-value">{summary.parsed}</div>
+			<div class="stat-label">Parsed</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-value">{summary.validationPassed}</div>
+			<div class="stat-label">Valid</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-value" style={`color: ${scoreColor(summary.avgScore)}`}>{summary.avgScore}</div>
+			<div class="stat-label">Avg Score /100</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-value">{summary.indexedSkills}</div>
+			<div class="stat-label">BM25 Indexed</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-value">{summary.lintErrors + summary.lintWarnings}</div>
+			<div class="stat-label">Lint Issues</div>
+		</div>
+	</div>
+
+	<!-- Pipeline -->
+	<div class="pipeline">
+		<div class="pipe-step"><span class="pipe-num">1</span> Parse</div>
+		<div class="pipe-arrow">&rarr;</div>
+		<div class="pipe-step"><span class="pipe-num">2</span> Validate</div>
+		<div class="pipe-arrow">&rarr;</div>
+		<div class="pipe-step"><span class="pipe-num">3</span> Lint</div>
+		<div class="pipe-arrow">&rarr;</div>
+		<div class="pipe-step"><span class="pipe-num">4</span> Score</div>
+		<div class="pipe-arrow">&rarr;</div>
+		<div class="pipe-step"><span class="pipe-num">5</span> Route</div>
+	</div>
+
+	<!-- Step 1: Parse -->
+	<h2>Step 1: Parse &mdash; <code>@skill-tools/core</code></h2>
+	<p>
+		Each SKILL.md is parsed into structured data: YAML frontmatter, markdown body, file references, and token counts.
+		<strong>{summary.parsed}/{summary.totalSkills}</strong> skills parsed successfully.
+	</p>
+
+	{summary.totalSkills - summary.parsed > 0 && (
+		<blockquote class="callout callout-info">
+			<strong>Note:</strong> The {summary.totalSkills - summary.parsed} parse failures below are caused by <strong>missing files in the upstream repositories</strong> &mdash; the SKILL.md files reference companion files (scripts, assets, references) that don't exist in the source repos.
+			For example, both <code>skill-creator</code> skills are documentation templates that intentionally list example file paths as illustrations. This is not a skill-tools bug.
+		</blockquote>
+	)}
+
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Skill</th>
+					<th>Source</th>
+					<th>Status</th>
+					<th>Tokens</th>
+				</tr>
+			</thead>
+			<tbody>
+				{parse.map((p) => (
+					<tr>
+						<td class="cell-name">{p.name}</td>
+						<td><span class={`src-tag ${sourceClass(p.source)}`}>{p.source.split('/')[0]}</span></td>
+						<td>
+							{p.ok
+								? <span class="badge-pass">PASS</span>
+								: (
+									<details class="expandable">
+										<summary>
+											<span class="badge-fail">FAIL</span>
+											<span class="expand-hint">{p.errors?.length} issue{(p.errors?.length ?? 0) > 1 ? 's' : ''}</span>
+										</summary>
+										<ul class="expand-list">
+											{p.errors?.map((e) => (
+												<li>{e}</li>
+											))}
+										</ul>
+									</details>
+								)
+							}
+						</td>
+						<td class="cell-mono">{p.ok ? p.tokenCount?.toLocaleString() : '—'}</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Step 2: Validate -->
+	<h2>Step 2: Validate &mdash; <code>skill-tools validate</code></h2>
+	<p>
+		Structural validation checks directory layout, file references, and spec compliance.
+		<strong class="text-green">{summary.validationPassed} passed</strong>,
+		<strong class="text-red">{summary.validationFailed} failed</strong>.
+	</p>
+
+	{summary.validationFailed > 0 && (
+		<blockquote class="callout callout-info">
+			<strong>Root cause:</strong> All {summary.validationFailed} validation failures are <code>file-reference-exists</code> errors &mdash; the upstream SKILL.md files reference companion files or directories that are missing from their source repositories. The <code>skill-creator</code> skills are documentation templates with intentional example paths; the others (<code>jupyter-notebook</code>, <code>notion-research-documentation</code>) appear to have incomplete asset directories in the upstream repos.
+		</blockquote>
+	)}
+
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Skill</th>
+					<th>Source</th>
+					<th>Status</th>
+					<th>Issues</th>
+				</tr>
+			</thead>
+			<tbody>
+				{validation.map((v) => (
+					<tr>
+						<td class="cell-name">{v.name}</td>
+						<td><span class={`src-tag ${sourceClass(v.source)}`}>{v.source.split('/')[0]}</span></td>
+						<td>
+							{v.valid
+								? <span class="badge-pass">PASS</span>
+								: <span class="badge-fail">FAIL</span>
+							}
+						</td>
+						<td>
+							{v.diagnostics.length === 0
+								? <span class="text-dim">None</span>
+								: v.diagnostics.length === 1
+									? (
+										<span class="single-diag">
+											<span class={`sev-dot sev-${v.diagnostics[0].severity}`}></span>
+											<span class="diag-msg">{v.diagnostics[0].message}</span>
+										</span>
+									)
+									: (
+										<details class="expandable">
+											<summary>
+												<span class="diag-summary">
+													{v.diagnostics.filter(d => d.severity === 'error').length > 0 &&
+														<span class="text-red">{v.diagnostics.filter(d => d.severity === 'error').length} error{v.diagnostics.filter(d => d.severity === 'error').length > 1 ? 's' : ''}</span>
+													}
+													{v.diagnostics.filter(d => d.severity === 'warning').length > 0 &&
+														<span class="text-orange">{v.diagnostics.filter(d => d.severity === 'warning').length} warn</span>
+													}
+													{v.diagnostics.filter(d => d.severity === 'info').length > 0 &&
+														<span class="text-dim">{v.diagnostics.filter(d => d.severity === 'info').length} info</span>
+													}
+												</span>
+											</summary>
+											<ul class="expand-list">
+												{v.diagnostics.map((d) => (
+													<li>
+														<span class={`sev-dot sev-${d.severity}`}></span>
+														{d.message}
+													</li>
+												))}
+											</ul>
+										</details>
+									)
+							}
+						</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Step 3: Lint -->
+	<h2>Step 3: Lint &mdash; <code>skill-tools lint</code></h2>
+	<p>
+		Best-practice analysis: description quality, instruction clarity, error handling, heading consistency, security.
+		<strong class="text-red">{summary.lintErrors} errors</strong>,
+		<strong class="text-orange">{summary.lintWarnings} warnings</strong>,
+		<strong class="text-dim">{summary.lintInfo} info</strong>.
+	</p>
+
+	<blockquote class="callout callout-info">
+		<strong>Root cause:</strong> All findings are about the <strong>upstream skill content</strong>, not skill-tools itself.
+		Lint errors are hardcoded <code>/tmp/</code> paths in upstream instructions (<code>no-hardcoded-paths</code>).
+		Warnings flag upstream descriptions missing trigger keywords or using generic verbs.
+		Info items suggest upstream skills add error handling sections or fix heading hierarchy.
+	</blockquote>
+
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Skill</th>
+					<th>Source</th>
+					<th>Errors</th>
+					<th>Warnings</th>
+					<th>Info</th>
+					<th>Top Finding</th>
+				</tr>
+			</thead>
+			<tbody>
+				{lint.map((l) => (
+					<tr>
+						<td class="cell-name">{l.name}</td>
+						<td><span class={`src-tag ${sourceClass(l.source)}`}>{l.source.split('/')[0]}</span></td>
+						<td class={l.errorCount > 0 ? 'text-red cell-mono' : 'text-dim cell-mono'}>{l.errorCount}</td>
+						<td class={l.warningCount > 0 ? 'text-orange cell-mono' : 'text-dim cell-mono'}>{l.warningCount}</td>
+						<td class="text-dim cell-mono">{l.infoCount}</td>
+						<td class="cell-finding">
+							{l.diagnostics.length === 0
+								? <span class="text-dim">Clean</span>
+								: l.diagnostics.length === 1
+									? (
+										<span class="single-diag">
+											<span class={`sev-dot sev-${l.diagnostics[0].severity}`}></span>
+											<code class="rule-id">{l.diagnostics[0].ruleId}</code>
+										</span>
+									)
+									: (
+										<details class="expandable">
+											<summary>
+												<span class={`sev-dot sev-${l.diagnostics[0].severity}`}></span>
+												<code class="rule-id">{l.diagnostics[0].ruleId}</code>
+												<span class="expand-hint">+{l.diagnostics.length - 1} more</span>
+											</summary>
+											<ul class="expand-list">
+												{l.diagnostics.map((d) => (
+													<li>
+														<span class={`sev-dot sev-${d.severity}`}></span>
+														<code class="rule-id">{d.ruleId}</code>
+														<span class="diag-msg">{d.message}</span>
+													</li>
+												))}
+											</ul>
+										</details>
+									)
+							}
+						</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Step 4: Score -->
+	<h2>Step 4: Score &mdash; <code>skill-tools score</code></h2>
+	<p>
+		Quality scoring across 5 dimensions: Description Quality (30), Instruction Clarity (25), Spec Compliance (20), Progressive Disclosure (15), Security (10).
+		Average: <strong style={`color: ${scoreColor(summary.avgScore)}`}>{summary.avgScore}/100</strong>.
+	</p>
+
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Skill</th>
+					<th>Source</th>
+					<th>Score</th>
+					<th>Description</th>
+					<th>Clarity</th>
+					<th>Spec</th>
+					<th>Disclosure</th>
+					<th>Security</th>
+				</tr>
+			</thead>
+			<tbody>
+				{scores.map((s, i) => (
+					<tr>
+						<td class="cell-mono cell-rank">{i + 1}</td>
+						<td class="cell-name">{s.name}</td>
+						<td><span class={`src-tag ${sourceClass(s.source)}`}>{s.source.split('/')[0]}</span></td>
+						<td>
+							<span class="score-badge" style={`background: ${scoreColor(s.score)}15; color: ${scoreColor(s.score)}; border-color: ${scoreColor(s.score)}40`}>
+								{s.score}
+							</span>
+						</td>
+						{s.dimensions.map((d) => (
+							<td>
+								<div class="dim-bar">
+									<div class="dim-fill" style={`width: ${(d.score / d.max) * 100}%`}></div>
+								</div>
+								<span class="dim-value">{d.score}/{d.max}</span>
+							</td>
+						))}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Step 5: Route -->
+	<h2>Step 5: Route &mdash; <code>@skill-tools/router</code></h2>
+	<p>
+		BM25 skill routing: given a natural-language query, the router ranks the best-matching skills.
+		<strong>{summary.indexedSkills}</strong> skills indexed.
+	</p>
+
+	<div class="route-grid">
+		{routing.map((r) => (
+			<div class="route-card">
+				<div class="route-query">{r.query}</div>
+				<div class="route-results">
+					{r.results.map((res, i) => (
+						<div class="route-result">
+							<span class="route-rank">#{i + 1}</span>
+							<span class="route-skill">{res.skill}</span>
+							<div class="route-bar-wrap">
+								<div class="route-bar" style={`width: ${res.score * 100}%`}></div>
+							</div>
+							<span class="route-score">{res.score.toFixed(3)}</span>
+						</div>
+					))}
+				</div>
+			</div>
+		))}
+	</div>
+
+	<!-- Conflicts -->
+	{conflicts.length > 0 && (
+		<h2>Conflict Detection</h2>
+		<p>
+			Skills with highly overlapping descriptions that may confuse routing.
+			Threshold: <code>0.7</code>. These overlaps exist because the <strong>upstream skill descriptions</strong> are similar enough to create routing ambiguity &mdash; skill-tools surfaces these so authors can differentiate their skills.
+		</p>
+		<div class="conflict-list">
+			{conflicts.map((c) => (
+				<div class="conflict-card">
+					<div class="conflict-skills">
+						{c.skills.map((s) => <code>{s}</code>)}
+						<span class="conflict-sim">{c.similarity.toFixed(3)} similarity</span>
+					</div>
+					<p class="conflict-suggestion">{c.suggestion}</p>
+				</div>
+			))}
+		</div>
+	)}
+
+	<!-- How to reproduce -->
+	<h2>Reproduce This</h2>
+	<p>Run the full pipeline yourself:</p>
+	<div class="terminal">
+		<div class="terminal-bar">
+			<span class="tdot tdot-r"></span>
+			<span class="tdot tdot-y"></span>
+			<span class="tdot tdot-g"></span>
+			<span class="tfile">terminal</span>
+		</div>
+		<pre><code><span class="t-c"># Clone the skill-tools repo</span>
+<span class="t-p">$</span> git clone https://github.com/skill-tools/skill-tools
+<span class="t-p">$</span> cd skill-tools && pnpm install && pnpm build
+
+<span class="t-c"># Run the ecosystem demo</span>
+<span class="t-p">$</span> pnpm tsx examples/anthropic-skills-demo.ts
+
+<span class="t-c"># Or use the CLI on any skill</span>
+<span class="t-p">$</span> npx skill-tools check ./path/to/skills/</code></pre>
+	</div>
+
+	<p class="generated-at">
+		Data generated on {new Date(data.generatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} from {data.sources.length} repositories.
+	</p>
+	</div>
+</Base>
+
+<style>
+	/* Full-width demo page layout */
+	.demo-page {
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 3rem 3rem 4rem;
+		line-height: 1.7;
+	}
+
+	.demo-page :global(h1) {
+		font-size: clamp(1.5rem, 3vw, 2.2rem);
+		margin-bottom: 0.75rem;
+	}
+
+	.demo-page :global(h2) {
+		font-size: 1.15rem;
+		margin-top: 3rem;
+		margin-bottom: 1rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.demo-page :global(p) {
+		margin-bottom: 1rem;
+		color: var(--muted);
+		font-family: var(--font-body);
+		font-size: 0.9rem;
+	}
+
+	.demo-page :global(a) { color: var(--blue); }
+	.demo-page :global(a:hover) { text-decoration: underline; }
+	.demo-page :global(strong) { color: var(--text); font-weight: 600; }
+
+	.demo-page :global(table) { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+	.demo-page :global(th) { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 2px solid var(--border); color: var(--text); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+	.demo-page :global(td) { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); font-family: var(--font-body); font-size: 0.85rem; }
+	.demo-page :global(blockquote) { border-left: 3px solid var(--blue); padding: 0.75rem 1rem; margin-bottom: 1rem; background: var(--blue-bg); border-radius: 0 6px 6px 0; }
+	.demo-page :global(blockquote p) { margin-bottom: 0; }
+	.demo-page :global(code) { font-family: var(--font); }
+
+	/* Callout boxes for root-cause attribution */
+	.callout {
+		font-size: 0.82rem;
+		line-height: 1.6;
+		padding: 0.85rem 1rem;
+		margin-bottom: 1.25rem;
+		border-radius: 0 6px 6px 0;
+	}
+
+	.callout :global(p) {
+		margin-bottom: 0;
+		font-size: 0.82rem;
+	}
+
+	.callout :global(code) {
+		font-size: 0.75rem;
+	}
+
+	.callout-info {
+		border-left: 3px solid var(--blue);
+		background: var(--blue-bg);
+		color: var(--muted);
+	}
+
+	.callout-info :global(strong) {
+		color: var(--text);
+	}
+
+	/* Source badges */
+	.source-badges {
+		display: flex;
+		gap: 0.5rem;
+		margin: 1rem 0 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.source-badge {
+		display: inline-block;
+		padding: 0.3rem 0.65rem;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-family: var(--font);
+		font-weight: 500;
+		border: 1px solid var(--border);
+		color: var(--text);
+		transition: all 0.15s;
+	}
+
+	.source-badge:hover {
+		text-decoration: none;
+		border-color: var(--blue);
+		color: var(--blue);
+	}
+
+	.source-badge.src-anthropic { border-left: 3px solid #d97706; }
+	.source-badge.src-openai { border-left: 3px solid #10b981; }
+	.source-badge.src-vercel { border-left: 3px solid var(--blue); }
+
+	/* Stats grid */
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		gap: 0.75rem;
+		margin: 1.5rem 0 2rem;
+	}
+
+	.stat-card {
+		padding: 1rem;
+		background: var(--bg2);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		text-align: center;
+	}
+
+	.stat-value {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--text);
+		line-height: 1.2;
+	}
+
+	.stat-label {
+		font-size: 0.7rem;
+		color: var(--dim);
+		margin-top: 0.25rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	/* Pipeline */
+	.pipeline {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0 0 2.5rem;
+		padding: 1rem 1.25rem;
+		background: var(--bg2);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		overflow-x: auto;
+	}
+
+	.pipe-step {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.78rem;
+		font-weight: 500;
+		color: var(--text);
+		white-space: nowrap;
+	}
+
+	.pipe-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: var(--blue);
+		color: #fff;
+		font-size: 0.65rem;
+		font-weight: 700;
+	}
+
+	.pipe-arrow {
+		color: var(--dim);
+		font-size: 0.9rem;
+	}
+
+	/* Tables */
+	.table-wrap {
+		overflow-x: auto;
+		margin-bottom: 1.5rem;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+	}
+
+	.table-wrap table {
+		margin-bottom: 0;
+		border: none;
+	}
+
+	.table-wrap th,
+	.table-wrap td {
+		border-bottom-color: var(--border);
+	}
+
+	.table-wrap tr:last-child td {
+		border-bottom: none;
+	}
+
+	.cell-name {
+		font-weight: 500;
+		color: var(--text);
+		white-space: nowrap;
+	}
+
+	.cell-mono {
+		font-family: var(--font);
+		font-size: 0.8rem;
+	}
+
+	.cell-rank {
+		color: var(--dim);
+		width: 2rem;
+	}
+
+	.cell-finding code {
+		font-size: 0.72rem;
+		padding: 0.1em 0.3em;
+	}
+
+	/* Source tags */
+	.src-tag {
+		display: inline-block;
+		padding: 0.15rem 0.4rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+		font-family: var(--font);
+		font-weight: 500;
+		background: var(--bg3);
+		color: var(--muted);
+	}
+
+	.src-tag.src-anthropic { color: #d97706; background: #fef3c720; }
+	.src-tag.src-openai { color: #10b981; background: #d1fae520; }
+	.src-tag.src-vercel { color: var(--blue); background: var(--blue-bg); }
+
+	/* Badges */
+	.badge-pass {
+		display: inline-block;
+		padding: 0.15rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+		font-weight: 600;
+		font-family: var(--font);
+		background: #dcfce7;
+		color: var(--green);
+	}
+
+	.badge-fail {
+		display: inline-block;
+		padding: 0.15rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+		font-weight: 600;
+		font-family: var(--font);
+		background: #fef2f2;
+		color: #dc2626;
+	}
+
+	/* Text colors */
+	.text-green { color: var(--green); }
+	.text-red { color: #dc2626; }
+	.text-orange { color: var(--orange); }
+	.text-dim { color: var(--dim); }
+
+	.diag-summary {
+		display: flex;
+		gap: 0.5rem;
+		font-size: 0.78rem;
+		font-family: var(--font);
+	}
+
+	/* Score badge */
+	.score-badge {
+		display: inline-block;
+		padding: 0.2rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.78rem;
+		font-weight: 700;
+		font-family: var(--font);
+		border: 1px solid;
+	}
+
+	/* Dimension bars */
+	.dim-bar {
+		width: 70px;
+		height: 5px;
+		background: var(--bg3);
+		border-radius: 3px;
+		overflow: hidden;
+		margin-bottom: 2px;
+	}
+
+	.dim-fill {
+		height: 100%;
+		background: var(--blue);
+		border-radius: 3px;
+		transition: width 0.3s;
+	}
+
+	.dim-value {
+		font-size: 0.65rem;
+		font-family: var(--font);
+		color: var(--dim);
+	}
+
+	/* Route cards */
+	.route-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.route-card {
+		background: var(--bg2);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 0.85rem 1rem;
+	}
+
+	.route-query {
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--text);
+		margin-bottom: 0.6rem;
+		font-family: var(--font-body);
+	}
+
+	.route-query::before {
+		content: 'Q: ';
+		color: var(--blue);
+		font-weight: 700;
+		font-family: var(--font);
+		font-size: 0.75rem;
+	}
+
+	.route-results {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+
+	.route-result {
+		display: grid;
+		grid-template-columns: 24px 1fr auto auto;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.75rem;
+	}
+
+	.route-rank {
+		color: var(--dim);
+		font-family: var(--font);
+		font-size: 0.65rem;
+	}
+
+	.route-skill {
+		color: var(--text);
+		font-weight: 500;
+		font-size: 0.75rem;
+	}
+
+	.route-bar-wrap {
+		width: 50px;
+		height: 5px;
+		background: var(--bg3);
+		border-radius: 3px;
+		overflow: hidden;
+	}
+
+	.route-bar {
+		height: 100%;
+		background: var(--green);
+		border-radius: 3px;
+	}
+
+	.route-score {
+		font-family: var(--font);
+		font-size: 0.65rem;
+		color: var(--dim);
+		width: 35px;
+		text-align: right;
+	}
+
+	/* Conflict cards */
+	.conflict-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.conflict-card {
+		background: #fef3c720;
+		border: 1px solid #fde68a;
+		border-radius: 8px;
+		padding: 0.85rem 1rem;
+	}
+
+	.conflict-skills {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.35rem;
+		flex-wrap: wrap;
+	}
+
+	.conflict-skills code {
+		font-size: 0.78rem;
+	}
+
+	.conflict-sim {
+		font-size: 0.7rem;
+		color: var(--orange);
+		font-family: var(--font);
+		font-weight: 500;
+	}
+
+	.conflict-suggestion {
+		font-size: 0.78rem;
+		color: var(--muted);
+		margin-bottom: 0;
+	}
+
+	/* Generated at */
+	.generated-at {
+		font-size: 0.72rem;
+		color: var(--dim);
+		margin-top: 2rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--border);
+	}
+
+	/* Rule ID badges */
+	.rule-id {
+		background: var(--bg3);
+		color: var(--muted);
+		border: 1px solid var(--border);
+	}
+
+	/* Expandable details/summary */
+	.expandable {
+		cursor: pointer;
+	}
+
+	.expandable summary {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		list-style: none;
+		font-size: 0.8rem;
+	}
+
+	.expandable summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.expandable summary::before {
+		content: '▸';
+		font-size: 0.65rem;
+		color: var(--dim);
+		transition: transform 0.15s;
+		flex-shrink: 0;
+	}
+
+	.expandable[open] summary::before {
+		transform: rotate(90deg);
+	}
+
+	.expand-hint {
+		font-size: 0.7rem;
+		color: var(--dim);
+		font-family: var(--font);
+		white-space: nowrap;
+	}
+
+	.expand-list {
+		margin-top: 0.4rem;
+		padding-left: 0.75rem;
+		list-style: none;
+		font-size: 0.75rem;
+		color: var(--muted);
+		font-family: var(--font-body);
+		line-height: 1.5;
+		border-left: 2px solid var(--border);
+	}
+
+	.expand-list li {
+		display: flex;
+		align-items: baseline;
+		gap: 0.35rem;
+		padding: 0.15rem 0;
+		margin-bottom: 0;
+	}
+
+	.expand-list code {
+		font-size: 0.68rem;
+		flex-shrink: 0;
+	}
+
+	/* Severity dots */
+	.sev-dot {
+		display: inline-block;
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.sev-error { background: #dc2626; }
+	.sev-warning { background: var(--orange); }
+	.sev-info { background: var(--dim); }
+
+	/* Single diagnostic inline */
+	.single-diag {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.75rem;
+	}
+
+	.diag-msg {
+		color: var(--muted);
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		line-height: 1.4;
+	}
+
+	/* Responsive */
+	@media (max-width: 1024px) {
+		.demo-page {
+			padding: 2rem 2rem 3rem;
+		}
+
+		.stats-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.dim-bar {
+			width: 50px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.demo-page {
+			padding: 1.5rem 1.25rem 2rem;
+		}
+
+		.stats-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.pipeline {
+			gap: 0.3rem;
+			padding: 0.75rem;
+		}
+
+		.pipe-step {
+			font-size: 0.7rem;
+		}
+
+		.route-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.dim-bar {
+			width: 35px;
+		}
+	}
+</style>
