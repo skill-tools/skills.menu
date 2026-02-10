@@ -1,45 +1,52 @@
 ---
 ---
 
-<section class="cta">
+<section class="cta-section">
 <div class="container">
-	<div class="cta-inner">
-		<div class="cta-text">
-			<h2><span class="hl-g">Open</span> standard.<br /><span class="hl-p">Portable</span> skills.</h2>
-			<p>Built on the Agent Skills specification at agentskills.io — a vendor-neutral format for packaging AI agent capabilities.</p>
-		</div>
+	<div class="cta-box">
+		<h2>Open standard. Portable skills.</h2>
+		<p>Based on the agentskills.io specification. Apache-2.0 licensed.</p>
 		<div class="cta-actions">
-			<a href="https://agentskills.io/specification" target="_blank" rel="noopener" class="btn btn-fill">Read the Spec <span class="btn-arrow">&rarr;</span></a>
-			<a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener" class="btn btn-outline">Reference Library</a>
+			<a href="https://agentskills.io/specification" target="_blank" rel="noopener" class="btn btn-primary">Read the Specification</a>
+			<a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener" class="btn">View on GitHub →</a>
 		</div>
 	</div>
 </div>
 </section>
 
 <style>
-	.cta { position: relative; z-index: 10; padding: 6rem 0; }
+	.cta-section { padding: 0; }
 
-	.cta-inner {
-		background: var(--bg2);
-		border: 1px solid var(--border);
-		border-radius: 16px;
-		padding: clamp(2.5rem, 5vw, 4rem);
+	.cta-box {
+		text-align: center;
+		padding: 3rem 0;
+		background: var(--blue-bg);
+		border: 1px solid var(--blue-border);
+		border-radius: 12px;
+		margin-bottom: 3rem;
+	}
+
+	.cta-box h2 {
+		font-size: 1.25rem;
+		font-weight: 700;
+		margin-bottom: 0.5rem;
+	}
+
+	.cta-box p {
+		font-family: var(--font-body);
+		color: var(--muted);
+		font-size: 0.85rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.cta-actions {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 2rem;
+		justify-content: center;
+		gap: 0.75rem;
 		flex-wrap: wrap;
 	}
 
-	.cta-text h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); letter-spacing: -0.02em; margin-bottom: 0.5rem; }
-	.hl-g { color: var(--green); }
-	.hl-p { color: var(--pink); }
-	.cta-text p { color: var(--muted); font-size: 0.95rem; max-width: 440px; line-height: 1.7; }
-	.cta-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-
-	@media (max-width: 900px) {
-		.cta-inner { flex-direction: column; text-align: center; }
-		.cta-actions { justify-content: center; }
+	@media (max-width: 768px) {
+		.cta-actions { flex-direction: column; align-items: center; }
 	}
-	@media (max-width: 768px) { .cta { padding: 4rem 0; } }
 </style>

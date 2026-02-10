@@ -3,65 +3,49 @@
 
 <section class="install-section">
 <div class="container">
-	<div class="install-grid">
-		<div class="install-left">
-			<h2>Get started<br />in <span class="hl">seconds</span>.</h2>
-			<p>Four packages. One ecosystem. Parse and validate skills with the core library, lint them with the CLI, route by intent with embeddings, or generate from your existing API specs.</p>
+	<div class="section-label">// quick start</div>
+
+	<div class="terminal">
+		<div class="terminal-bar">
+			<span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
+			<span class="tfile">terminal</span>
 		</div>
-		<div class="terminal">
-			<div class="terminal-bar">
-				<span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
-				<span class="tfile">~/project</span>
-			</div>
-			<pre><code><span class="t-p">$</span> npm i @skill-tools/core       <span class="t-c"># parser &amp; types</span>
-<span class="t-p">$</span> npm i -g skill-tools           <span class="t-c"># validate, lint, score</span>
-<span class="t-p">$</span> npm i @skill-tools/router   <span class="t-c"># semantic routing</span>
-<span class="t-p">$</span> npm i -g @skill-tools/gen   <span class="t-c"># generate from OpenAPI</span></code></pre>
+		<pre><code><span class="t-c"># install globally</span>
+<span class="t-p">$ </span>npm install <span class="t-flag">-g</span> skill-tools
+
+<span class="t-c"># validate, lint, and score in one pass</span>
+<span class="t-p">$ </span>skill-tools check ./my-skill/
+<span class="t-c">  ✓ valid   8/8 lint rules passed   score: 87/100</span>
+
+<span class="t-c"># generate a skill from an openapi spec</span>
+<span class="t-p">$ </span>npx skillgen openapi ./petstore.yaml <span class="t-flag">-o</span> ./skills/</code></pre>
+	</div>
+
+	<br />
+
+	<div class="terminal">
+		<div class="terminal-bar">
+			<span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
+			<span class="tfile">route-skills.ts</span>
 		</div>
+		<pre><code><span class="hl-keyword">import</span> &#123; <span class="hl-fn">SkillRouter</span> &#125; <span class="hl-keyword">from</span> <span class="hl-string">'@skill-tools/router'</span>;
+
+<span class="t-c">// index skills — uses BM25 by default, zero config</span>
+<span class="hl-keyword">const</span> <span class="hl-prop">router</span> = <span class="hl-keyword">new</span> <span class="hl-fn">SkillRouter</span>();
+<span class="hl-keyword">await</span> router.<span class="hl-fn">indexDirectory</span>(<span class="hl-string">'./skills/'</span>);
+
+<span class="t-c">// route a user query to the best skill</span>
+<span class="hl-keyword">const</span> <span class="hl-prop">results</span> = <span class="hl-keyword">await</span> router.<span class="hl-fn">select</span>(<span class="hl-string">'deploy my app to production'</span>);
+<span class="t-c">// → [&#123; skill: 'deploy-vercel', score: 1.0 &#125;]</span>
+
+<span class="t-c">// persist the index for instant startup</span>
+<span class="hl-keyword">const</span> <span class="hl-prop">snapshot</span> = router.<span class="hl-fn">save</span>();</code></pre>
 	</div>
 </div>
 </section>
 
 <style>
 	.install-section {
-		position: relative;
-		z-index: 10;
-		padding: 6rem 0;
-	}
-
-	.install-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 3rem;
-		align-items: center;
-	}
-
-	.install-left h2 {
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.05;
-		margin-bottom: 1.25rem;
-	}
-
-	.install-left .hl {
-		color: var(--green);
-	}
-
-	.install-left p {
-		color: var(--muted);
-		font-size: 0.95rem;
-		line-height: 1.7;
-		max-width: 440px;
-	}
-
-	@media (max-width: 900px) {
-		.install-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (max-width: 768px) {
-		.install-section {
-			padding: 4rem 0;
-		}
+		padding: 0;
 	}
 </style>

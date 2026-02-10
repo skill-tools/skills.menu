@@ -3,20 +3,22 @@
 
 <div class="marquee-section">
 <div class="marquee-track">
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--green)"></span>@skill-tools/core</span>
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--pink)"></span>skill-tools CLI</span>
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--orange)"></span>@skill-tools/router</span>
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--purple)"></span>@skill-tools/gen</span>
-	<span class="marquee-item">114 tests passing</span>
+	<span class="marquee-item">@skill-tools/core</span>
+	<span class="marquee-item">skill-tools CLI</span>
+	<span class="marquee-item">@skill-tools/router</span>
+	<span class="marquee-item">@skill-tools/gen</span>
+	<span class="marquee-item">131 tests passing</span>
 	<span class="marquee-item">zero LLM dependencies</span>
+	<span class="marquee-item">BM25 full-text search</span>
 	<span class="marquee-item">100% TypeScript</span>
 	<span class="marquee-item">Apache 2.0</span>
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--green)"></span>@skill-tools/core</span>
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--pink)"></span>skill-tools CLI</span>
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--orange)"></span>@skill-tools/router</span>
-	<span class="marquee-item"><span class="marquee-dot" style="background:var(--purple)"></span>@skill-tools/gen</span>
-	<span class="marquee-item">114 tests passing</span>
+	<span class="marquee-item">@skill-tools/core</span>
+	<span class="marquee-item">skill-tools CLI</span>
+	<span class="marquee-item">@skill-tools/router</span>
+	<span class="marquee-item">@skill-tools/gen</span>
+	<span class="marquee-item">131 tests passing</span>
 	<span class="marquee-item">zero LLM dependencies</span>
+	<span class="marquee-item">BM25 full-text search</span>
 	<span class="marquee-item">100% TypeScript</span>
 	<span class="marquee-item">Apache 2.0</span>
 </div>
@@ -24,9 +26,7 @@
 
 <style>
 	.marquee-section {
-		position: relative;
-		z-index: 10;
-		padding: 1.75rem 0;
+		padding: 1rem 0;
 		border-top: 1px solid var(--border);
 		border-bottom: 1px solid var(--border);
 		overflow: hidden;
@@ -34,25 +34,15 @@
 
 	.marquee-track {
 		display: flex;
-		gap: 3rem;
-		animation: marquee 35s linear infinite;
+		gap: 2.5rem;
+		animation: marquee 40s linear infinite;
 		white-space: nowrap;
 	}
 
 	.marquee-item {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
+		font-size: 0.72rem;
 		color: var(--dim);
 		flex-shrink: 0;
-	}
-
-	.marquee-dot {
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
 	}
 
 	@keyframes marquee {
@@ -61,8 +51,6 @@
 	}
 
 	@media (max-width: 768px) {
-		.marquee-section {
-			display: none;
-		}
+		.marquee-section { display: none; }
 	}
 </style>

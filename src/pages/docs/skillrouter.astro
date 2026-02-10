@@ -5,15 +5,15 @@ import Docs from '../../layouts/Docs.astro';
 <Docs title="@skill-tools/router">
 	<h1>@skill-tools/router</h1>
 	<p>
-		Semantic skill selection middleware for <a href="https://agentskills.io" target="_blank" rel="noopener">Agent Skills</a>.
-		Uses embedding-based routing to select which skills to inject into an agent's context window from large skill catalogs.
-		Zero external dependencies &mdash; built-in TF-IDF embeddings.
+		BM25 skill selection middleware for <a href="https://agentskills.io" target="_blank" rel="noopener">Agent Skills</a>.
+		Uses full-text search to select which skills to inject into an agent's context window from large skill catalogs.
+		Zero external dependencies &mdash; built-in Okapi BM25 engine.
 	</p>
 
 	<pre><code>npm install @skill-tools/router</code></pre>
 
 	<h2>Quick Start</h2>
-	<pre><code>import &#123; SkillRouter &#125; from 'skillrouter';
+	<pre><code>import &#123; SkillRouter &#125; from '@skill-tools/router';
 
 const router = new SkillRouter();
 
@@ -24,15 +24,15 @@ await router.indexSkills([
 ]);
 
 const results = await router.select('deploy my app');
-// [&#123; skill: 'deploy-vercel', score: 0.87, metadata: &#123;...&#125; &#125;]</code></pre>
+// [&#123; skill: 'deploy-vercel', score: 1.0, metadata: &#123;...&#125; &#125;]</code></pre>
 
 	<h2>API</h2>
 
 	<h3><code>SkillRouter</code></h3>
-	<p>Main class. Constructor accepts optional <code>SkillRouterOptions</code> with embedding config.</p>
+	<p>Main class. Constructor accepts optional <code>SkillRouterOptions</code> with embedding config and BM25 parameters.</p>
 
 	<h3><code>indexSkills(skills)</code></h3>
-	<p>Embed and store skill descriptions. Builds TF-IDF vocabulary from the corpus.</p>
+	<p>Index skill descriptions into the BM25 inverted index. Tokenizes, removes stop words, and builds posting lists.</p>
 
 	<h3><code>indexDirectory(dirPath)</code></h3>
 	<p>Auto-discover and index SKILL.md files in a directory.</p>
@@ -56,7 +56,7 @@ const results = await router.select('deploy my app');
 			<tr>
 				<td><code>threshold</code></td>
 				<td>0.0</td>
-				<td>Minimum cosine similarity score</td>
+				<td>Minimum BM25 score (normalized 0&ndash;1)</td>
 			</tr>
 			<tr>
 				<td><code>boost</code></td>
@@ -75,40 +75,41 @@ const results = await router.select('deploy my app');
 	<p>Find skills with highly similar descriptions that may conflict.</p>
 
 	<h3><code>save() / load(snapshot)</code></h3>
-	<p>Serialize/restore the full index as JSON. Useful for persistence.</p>
+	<p>Serialize/restore the full index as JSON. Useful for instant startup persistence.</p>
 
 	<h3><code>SkillRouter.fromSnapshot(snapshot)</code></h3>
 	<p>Static factory to restore from a serialized snapshot.</p>
 
-	<h2>Embedding Providers</h2>
+	<h2>BM25 Parameters</h2>
 	<table>
 		<thead>
 			<tr>
-				<th>Provider</th>
-				<th>Status</th>
+				<th>Parameter</th>
+				<th>Default</th>
 				<th>Description</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
-				<td><code>'local'</code></td>
-				<td>Built-in</td>
-				<td>TF-IDF + FNV-1a hash, 256 dimensions, zero dependencies</td>
+				<td><code>k1</code></td>
+				<td>1.2</td>
+				<td>Term frequency saturation. Higher values give more weight to repeated terms.</td>
 			</tr>
 			<tr>
-				<td><code>'custom'</code></td>
-				<td>Supported</td>
-				<td>Bring your own embedding function</td>
-			</tr>
-			<tr>
-				<td><code>'openai'</code></td>
-				<td>Planned</td>
-				<td>OpenAI embeddings API</td>
+				<td><code>b</code></td>
+				<td>0.75</td>
+				<td>Length normalization. 0 = ignore length, 1 = fully normalize.</td>
 			</tr>
 		</tbody>
 	</table>
 
-	<h3>Custom Provider</h3>
+	<pre><code>const router = new SkillRouter(&#123;
+  bm25: &#123; k1: 1.5, b: 0.8 &#125;,
+&#125;);</code></pre>
+
+	<h2>Embedding Providers (Advanced)</h2>
+	<p>By default, the router uses BM25 full-text search (zero dependencies). For custom semantic search, you can provide your own embedding function:</p>
+
 	<pre><code>const router = new SkillRouter(&#123;
   embedding: &#123;
     provider: 'custom',
@@ -122,9 +123,23 @@ const results = await router.select('deploy my app');
 
 	<h2>Architecture</h2>
 	<ul>
-		<li><code>indexSkills()</code> calls <code>buildVocabulary()</code> on the local provider before embedding, ensuring TF-IDF values are computed from the full corpus</li>
-		<li><code>select()</code> fetches <code>topK * 2</code> results from the vector store, applies exclude/boost, then trims to <code>topK</code></li>
-		<li>Snapshot format is versioned (<code>version: 1</code>) with dimension validation on load</li>
-		<li><code>MemoryVectorStore</code> uses brute-force cosine similarity &mdash; suitable for &lt;1,000 skills</li>
+		<li><strong>Inverted index</strong> maps terms to posting lists &mdash; only documents containing query terms are scored</li>
+		<li><strong>IDF pre-computation</strong> at index time for O(q) query performance</li>
+		<li><strong>Float64Array</strong> score accumulator for efficient scoring</li>
+		<li>Score normalization to [0, 1] &mdash; divide by max score per query</li>
+		<li>Scales to 10,000+ skills with zero external dependencies</li>
+		<li>Snapshot format includes inverted index, IDF cache, and BM25 parameters</li>
+		<li>Dual-path: BM25 default, embedding + vector store fallback for custom providers</li>
 	</ul>
+
+	<h2>BM25Index (Direct Use)</h2>
+	<p>The BM25 engine is also exported for standalone use:</p>
+	<pre><code>import &#123; BM25Index &#125; from '@skill-tools/router';
+
+const index = new BM25Index();
+index.add('doc-1', 'Deploy applications to Vercel');
+index.add('doc-2', 'Run unit tests with Vitest');
+
+const results = index.search('deploy', &#123; topK: 5 &#125;);
+// [&#123; id: 'doc-1', score: 1.0 &#125;]</code></pre>
 </Docs>

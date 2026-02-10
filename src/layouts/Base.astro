@@ -1,4 +1,5 @@
 ---
+import '../styles/global.css';
 import Analytics from '@vercel/analytics/astro';
 
 interface Props {
@@ -20,7 +21,7 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
 			rel="stylesheet"
 		/>
 
@@ -28,29 +29,18 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 		<title>{title}</title>
 	</head>
 	<body>
-		<canvas id="bg-canvas"></canvas>
-
 		<header>
-			<nav>
+			<div class="container header-inner">
 				<a href="/" class="logo">
-					<div class="logo-mark">
-						<div class="l1"></div>
-						<div class="l2"></div>
-						<div class="l3"></div>
-						<div class="l4"></div>
-					</div>
+					<span class="logo-cursor"></span>
 					skills.menu
 				</a>
-				<ul class="nav-links">
-					<li><a href="#">Tools</a></li>
-					<li><a href="/docs/core">Docs</a></li>
-					<li><a href="/docs/specification">Specification</a></li>
-					<li><a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener" class="nav-cta">Get Started</a></li>
-				</ul>
-				<button class="mobile-menu" aria-label="Menu">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-				</button>
-			</nav>
+				<nav class="nav-links">
+					<a href="/docs/core">Docs</a>
+					<a href="/docs/specification">Specification</a>
+					<a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener">GitHub</a>
+				</nav>
+			</div>
 		</header>
 
 		<main>
@@ -60,212 +50,73 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 		<footer>
 			<div class="container footer-inner">
 				<span>Built for <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a></span>
-				<ul class="foot-links">
-					<li><a href="https://agentskills.io/specification" target="_blank" rel="noopener">Specification</a></li>
-					<li><a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener">GitHub</a></li>
-					<li><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">Reference</a></li>
-				</ul>
+				<span>Apache-2.0 · <a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.npmjs.com/org/skill-tools" target="_blank" rel="noopener">npm</a></span>
 			</div>
 		</footer>
 
-		<script src="/webgl-bg.js" is:inline></script>
 		<Analytics />
 	</body>
 </html>
 
 <style>
-	/* ─── WebGL Canvas ─── */
-	#bg-canvas {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 0;
-		pointer-events: none;
-	}
-
-	/* ─── Header ─── */
 	header {
-		position: fixed;
+		border-bottom: 1px solid var(--border);
+		padding: 1rem 0;
+		position: sticky;
 		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 200;
-		padding: 1.1rem 0;
-		background: rgba(0, 0, 0, 0.7);
-		backdrop-filter: blur(16px);
-		-webkit-backdrop-filter: blur(16px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+		background: var(--bg);
+		z-index: 100;
 	}
 
-	header nav {
+	.header-inner {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		max-width: var(--max-w);
-		margin: 0 auto;
-		padding: 0 2rem;
 	}
 
 	.logo {
-		display: flex;
-		align-items: center;
-		gap: 0.65rem;
-		font-family: var(--font-head);
 		font-weight: 700;
-		font-size: 1.15rem;
+		font-size: 0.95rem;
 		color: var(--text);
-	}
-
-	.logo:hover {
-		color: var(--green);
-	}
-
-	.logo-mark {
-		width: 34px;
-		height: 34px;
-		position: relative;
-	}
-
-	.logo-mark .l1 {
-		position: absolute;
-		width: 15px;
-		height: 15px;
-		border-radius: 3px 3px 3px 9px;
-		background: var(--green);
-		top: 0;
-		left: 0;
-	}
-
-	.logo-mark .l2 {
-		position: absolute;
-		width: 15px;
-		height: 15px;
-		border-radius: 3px 3px 9px 3px;
-		background: var(--pink);
-		top: 0;
-		right: 0;
-	}
-
-	.logo-mark .l3 {
-		position: absolute;
-		width: 15px;
-		height: 15px;
-		border-radius: 3px 9px 3px 3px;
-		background: var(--orange);
-		bottom: 0;
-		left: 0;
-		opacity: 0.85;
-	}
-
-	.logo-mark .l4 {
-		position: absolute;
-		width: 15px;
-		height: 15px;
-		border-radius: 9px 3px 3px 3px;
-		background: var(--purple);
-		bottom: 0;
-		right: 0;
-		opacity: 0.85;
-	}
-
-	.nav-links {
 		display: flex;
-		gap: 2rem;
-		list-style: none;
 		align-items: center;
+		gap: 0.5rem;
 	}
 
-	.nav-links a {
-		color: var(--muted);
-		font-size: 0.9rem;
-		font-weight: 500;
+	.logo:hover { text-decoration: none; color: var(--text); }
+
+	.logo-cursor {
+		display: inline-block;
+		width: 8px;
+		height: 16px;
+		background: var(--blue);
+		animation: blink 1s step-end infinite;
 	}
 
-	.nav-links a:hover {
-		color: var(--text);
-	}
+	@keyframes blink { 50% { opacity: 0; } }
 
-	.nav-cta {
-		background: var(--green);
-		color: var(--bg) !important;
-		padding: 0.5rem 1.2rem;
-		border-radius: 50px;
-		font-size: 0.85rem;
-		font-weight: 600;
-		font-family: var(--font-head);
-	}
+	.nav-links { display: flex; gap: 1.5rem; }
+	.nav-links a { font-size: 0.78rem; color: var(--muted); }
+	.nav-links a:hover { color: var(--text); text-decoration: none; }
 
-	.nav-cta:hover {
-		background: var(--text);
-		color: var(--bg) !important;
-	}
-
-	.mobile-menu {
-		display: none;
-		background: none;
-		border: none;
-		color: var(--text);
-		cursor: pointer;
-		padding: 4px;
-	}
-
-	.mobile-menu svg {
-		width: 24px;
-		height: 24px;
-	}
-
-	/* ─── Footer ─── */
 	footer {
-		position: relative;
-		z-index: 10;
 		border-top: 1px solid var(--border);
-		padding: 2.5rem 0;
+		padding: 2rem 0;
 	}
 
 	.footer-inner {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		flex-wrap: wrap;
-		gap: 1rem;
-		font-size: 0.8rem;
+		font-size: 0.72rem;
 		color: var(--dim);
 	}
 
-	.footer-inner a {
-		color: var(--muted);
-	}
+	.footer-inner a { color: var(--muted); }
+	.footer-inner a:hover { color: var(--text); }
 
-	.footer-inner a:hover {
-		color: var(--text);
-	}
-
-	.foot-links {
-		display: flex;
-		gap: 1.5rem;
-		list-style: none;
-	}
-
-	.foot-links a {
-		color: var(--muted);
-		font-size: 0.8rem;
-	}
-
-	/* ─── Responsive ─── */
 	@media (max-width: 768px) {
-		.nav-links {
-			display: none;
-		}
-
-		.mobile-menu {
-			display: block;
-		}
-
-		.footer-inner {
-			flex-direction: column;
-			text-align: center;
-		}
+		.nav-links { display: none; }
+		.footer-inner { flex-direction: column; text-align: center; gap: 0.5rem; }
 	}
 </style>

@@ -3,10 +3,7 @@
 
 <section class="skill-preview">
 <div class="container">
-	<div class="section-head">
-		<h2>The format.</h2>
-		<p>YAML frontmatter + Markdown body. That's it.</p>
-	</div>
+	<div class="section-label">// the format</div>
 	<div class="sp-grid">
 		<div class="terminal">
 			<div class="terminal-bar">
@@ -15,63 +12,79 @@
 			</div>
 			<pre><code><span class="hl-d">---</span>
 <span class="hl-k">name:</span> <span class="hl-v">deploy-vercel</span>
-<span class="hl-k">description:</span> <span class="hl-s">Deploy web apps to Vercel.</span>
-  <span class="hl-s">Use when pushing to production.</span>
-<span class="hl-k">version:</span> <span class="hl-v">1.0.0</span>
-<span class="hl-k">license:</span> <span class="hl-v">Apache-2.0</span>
+<span class="hl-k">description:</span> <span class="hl-s">&gt;-</span>
+  <span class="hl-s">Deploy applications to Vercel.</span>
+  <span class="hl-s">Use when pushing code to production.</span>
+<span class="hl-k">version:</span> <span class="hl-v">"1.0"</span>
 <span class="hl-d">---</span>
 
 <span class="hl-h1"># Deploy to Vercel</span>
 
 <span class="hl-h2">## Prerequisites</span>
-- Vercel CLI (<span class="hl-c">`npm i -g vercel`</span>)
-- Project linked (<span class="hl-c">`vercel link`</span>)
+- Vercel CLI installed
+- <span class="hl-c">`vercel.json`</span> in project root
 
 <span class="hl-h2">## Steps</span>
-1. Run <span class="hl-c">`vercel --prod`</span>
-2. Verify deployment URL in output
-3. Report the live URL to the user
+1. Run <span class="hl-c">`vercel login`</span>
+2. Run <span class="hl-c">`vercel --prod`</span>
+3. Verify the deployment URL
 
 <span class="hl-h2">## Error Handling</span>
-If deployment fails, run <span class="hl-c">`vercel logs`</span>.</code></pre>
+Check build logs if deployment fails.</code></pre>
 		</div>
 		<div class="annos">
-			<div class="anno"><div class="anno-lbl">Frontmatter</div><p>YAML metadata for discovery. Name is required, must match the parent directory, max 64 chars.</p></div>
-			<div class="anno"><div class="anno-lbl">Description</div><p>Required. Tells agents <em>when</em> to use this skill. Powers semantic routing and catalog discovery.</p></div>
-			<div class="anno"><div class="anno-lbl">Instructions</div><p>Markdown body the agent follows step-by-step. Keep under 5,000 tokens for optimal context window usage.</p></div>
-			<div class="anno"><div class="anno-lbl">Resources</div><p>Progressive disclosure. Reference scripts/, references/, and assets/ directories to keep the core skill lean.</p></div>
+			<div class="anno">
+				<div class="anno-title">YAML Frontmatter</div>
+				<p>Machine-readable metadata: name, description, version, model requirements, token budget.</p>
+			</div>
+			<div class="anno">
+				<div class="anno-title">Trigger Context</div>
+				<p>The description tells the agent <em>when</em> to activate this skill. BM25 indexes it for routing.</p>
+			</div>
+			<div class="anno">
+				<div class="anno-title">Step-by-Step Instructions</div>
+				<p>Markdown with code blocks, numbered steps, and prerequisites. The agent follows these to execute.</p>
+			</div>
+			<div class="anno">
+				<div class="anno-title">Error Recovery</div>
+				<p>What to do when things go wrong. Keeps the agent from getting stuck in a loop.</p>
+			</div>
 		</div>
 	</div>
 </div>
 </section>
 
 <style>
-	.skill-preview { position: relative; z-index: 10; padding: 6rem 0; }
+	.skill-preview { padding: 0; }
 
-	.section-head { text-align: center; margin-bottom: 4rem; }
-	.section-head h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 0.5rem; }
-	.section-head p { color: var(--muted); font-size: 1rem; }
-
-	.sp-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2.5rem; align-items: start; }
-
-	.annos { display: flex; flex-direction: column; gap: 1rem; }
-
-	.anno {
-		background: var(--bg2);
-		border: 1px solid var(--border);
-		border-radius: 10px;
-		padding: 1.1rem 1.4rem;
-		transition: border-color 0.2s;
+	.sp-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 2rem;
+		align-items: start;
 	}
-	.anno:hover { border-color: var(--border2); }
 
-	.anno-lbl { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3rem; font-weight: 600; }
-	.anno:nth-child(1) .anno-lbl { color: var(--green); }
-	.anno:nth-child(2) .anno-lbl { color: var(--pink); }
-	.anno:nth-child(3) .anno-lbl { color: var(--orange); }
-	.anno:nth-child(4) .anno-lbl { color: var(--purple); }
-	.anno p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+	.annos {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
 
-	@media (max-width: 900px) { .sp-grid { grid-template-columns: 1fr; } }
-	@media (max-width: 768px) { .skill-preview { padding: 4rem 0; } }
+	.anno-title {
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--text);
+		margin-bottom: 0.3rem;
+	}
+
+	.anno p {
+		font-family: var(--font-body);
+		font-size: 0.78rem;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	@media (max-width: 768px) {
+		.sp-grid { grid-template-columns: 1fr; }
+	}
 </style>

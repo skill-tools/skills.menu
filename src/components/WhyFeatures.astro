@@ -1,0 +1,67 @@
+---
+---
+
+<section class="why-section">
+<div class="container">
+	<div class="section-label">// why skill-tools</div>
+	<div class="features-grid">
+		<div class="feature">
+			<div class="feature-title">Zero dependencies</div>
+			<div class="feature-desc">Core parser and BM25 router have no external deps. Works anywhere Node runs.</div>
+		</div>
+		<div class="feature">
+			<div class="feature-title">Vendor neutral</div>
+			<div class="feature-desc">Not tied to any model or platform. Works with Claude, GPT, Gemini, or your own agent.</div>
+		</div>
+		<div class="feature">
+			<div class="feature-title">8 lint rules</div>
+			<div class="feature-desc">Catches secrets, hardcoded paths, generic descriptions, missing error handling.</div>
+		</div>
+		<div class="feature">
+			<div class="feature-title">Quality scoring</div>
+			<div class="feature-desc">0–100 score across 5 dimensions. Like Lighthouse for your agent skills.</div>
+		</div>
+		<div class="feature">
+			<div class="feature-title">BM25 routing</div>
+			<div class="feature-desc">Full-text search picks the right skill from 10,000+ in milliseconds. No API keys needed.</div>
+		</div>
+		<div class="feature">
+			<div class="feature-title">OpenAPI generation</div>
+			<div class="feature-desc">Turn any OpenAPI 3.x spec into validated SKILL.md files in seconds.</div>
+		</div>
+	</div>
+</div>
+</section>
+
+<style>
+	.why-section { padding: 0; }
+
+	.features-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 1.25rem;
+	}
+
+	.feature {
+		padding: 1rem;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+	}
+
+	.feature-title {
+		font-size: 0.78rem;
+		font-weight: 600;
+		margin-bottom: 0.3rem;
+	}
+
+	.feature-desc {
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		color: var(--muted);
+		line-height: 1.5;
+	}
+
+	@media (max-width: 768px) {
+		.features-grid { grid-template-columns: 1fr; }
+	}
+</style>

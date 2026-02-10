@@ -3,151 +3,65 @@
 
 <section class="hero">
 <div class="container">
-	<div class="hero-eyebrow">
-		<span class="eyebrow-pill">v0.1.0</span>
-		<span class="eyebrow-text">// agentskills.io open standard</span>
-	</div>
-	<h1>
-		The developer toolkit<br />for <span class="accent">agent skills</span>.
-		<span class="line2">Build, validate, route, and generate SKILL.md files — the portable format for AI agent capabilities.</span>
-	</h1>
-	<p class="hero-sub">
-		<code>SKILL.md</code> is a <strong>markdown file</strong> that teaches an AI agent one capability.
-		This toolkit lets you parse, validate, lint, score, route, and generate them — <strong>no LLM required</strong>.
+	<div class="badge">v0.1.0 · agentskills.io open standard</div>
+	<h1>Build, validate, and route<br /><span class="highlight">agent skills</span></h1>
+	<p class="hero-desc">
+		The complete toolkit for SKILL.md — the portable, vendor-neutral
+		format for packaging AI agent capabilities. Zero LLM dependencies.
 	</p>
 	<div class="hero-actions">
-		<a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener" class="btn btn-fill">npm install skill-tools <span class="btn-arrow">&darr;</span></a>
-		<a href="/docs/core" class="btn btn-outline">Read the Docs <span class="btn-arrow">&rarr;</span></a>
-	</div>
-
-	<div class="what-grid">
-		<div class="what-item">
-			<div class="what-num">WHAT</div>
-			<h3>SKILL.md</h3>
-			<p>A markdown file with YAML frontmatter that describes one capability an agent can perform.</p>
-		</div>
-		<div class="what-item">
-			<div class="what-num">WHY</div>
-			<h3>Portable skills</h3>
-			<p>One format, any agent. Share skills across teams, vendors, and frameworks.</p>
-		</div>
-		<div class="what-item">
-			<div class="what-num">HOW</div>
-			<h3>This toolkit</h3>
-			<p>Parse, validate, lint, score, route by intent, and auto-generate from OpenAPI specs.</p>
-		</div>
+		<a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener" class="btn btn-primary">npm install -g skill-tools</a>
+		<a href="/docs/core" class="btn">Read the Docs →</a>
 	</div>
 </div>
 </section>
 
 <style>
 	.hero {
-		position: relative;
-		z-index: 10;
-		padding: 10rem 0 5rem;
-		min-height: 100vh;
-		display: flex;
-		align-items: center;
+		padding: 5rem 0 3.5rem;
+		text-align: center;
 	}
 
-	.hero .container { width: 100%; }
-
-	.hero-eyebrow {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		margin-bottom: 2.5rem;
-	}
-
-	.eyebrow-pill {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		color: var(--green);
-		border: 1px solid rgba(62, 207, 142, 0.25);
-		padding: 0.35em 0.85em;
-		border-radius: 50px;
-		background: rgba(62, 207, 142, 0.06);
-		letter-spacing: 0.02em;
-	}
-
-	.eyebrow-text {
-		font-size: 0.82rem;
-		color: var(--dim);
-		font-family: var(--font-mono);
-	}
-
-	h1 {
-		font-size: clamp(3rem, 7vw, 6rem);
-		letter-spacing: -0.05em;
-		line-height: 1;
+	.badge {
+		display: inline-block;
+		font-size: 0.7rem;
+		color: var(--blue);
+		background: var(--blue-bg);
+		border: 1px solid var(--blue-border);
+		padding: 0.2rem 0.7rem;
+		border-radius: 100px;
 		margin-bottom: 1.5rem;
 	}
 
-	h1 .accent { color: var(--green); }
+	h1 {
+		font-size: 2.25rem;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		line-height: 1.3;
+		margin-bottom: 1.25rem;
+	}
 
-	h1 .line2 {
-		display: block;
-		color: var(--muted);
-		font-size: 0.48em;
-		font-weight: 500;
-		letter-spacing: -0.01em;
-		margin-top: 0.4em;
-		line-height: 1.4;
+	h1 .highlight { color: var(--blue); }
+
+	.hero-desc {
 		font-family: var(--font-body);
-	}
-
-	.hero-sub {
+		font-size: 0.95rem;
 		color: var(--muted);
-		font-size: 1.05rem;
-		max-width: 540px;
-		line-height: 1.8;
-		margin-bottom: 2.5rem;
+		max-width: 520px;
+		margin: 0 auto 2.5rem;
+		line-height: 1.7;
 	}
-
-	.hero-sub strong { color: var(--text); font-weight: 600; }
 
 	.hero-actions {
 		display: flex;
+		justify-content: center;
 		gap: 0.75rem;
-		align-items: center;
 		flex-wrap: wrap;
-		margin-bottom: 4rem;
 	}
-
-	.what-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 1px;
-		background: var(--border);
-		border: 1px solid var(--border);
-		border-radius: 14px;
-		overflow: hidden;
-		max-width: 760px;
-	}
-
-	.what-item { background: var(--bg); padding: 1.5rem 1.6rem; }
-
-	.what-num {
-		font-family: var(--font-mono);
-		font-size: 0.6rem;
-		letter-spacing: 0.1em;
-		margin-bottom: 0.5rem;
-		font-weight: 600;
-	}
-
-	.what-item:nth-child(1) .what-num { color: var(--green); }
-	.what-item:nth-child(2) .what-num { color: var(--pink); }
-	.what-item:nth-child(3) .what-num { color: var(--orange); }
-
-	.what-item h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
-	.what-item p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
-
-	@media (max-width: 900px) { .what-grid { grid-template-columns: 1fr; } }
 
 	@media (max-width: 768px) {
-		.hero { padding: 7rem 0 4rem; min-height: auto; }
-		h1 { font-size: clamp(2.5rem, 10vw, 4rem); }
-		.hero-actions { width: 100%; }
-		.hero-actions :global(.btn) { width: 100%; justify-content: center; }
+		.hero { padding: 3.5rem 0 2.5rem; }
+		h1 { font-size: 1.6rem; }
+		.hero-actions { flex-direction: column; align-items: center; }
 	}
 </style>

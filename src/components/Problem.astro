@@ -1,0 +1,72 @@
+---
+---
+
+<section class="problem-section">
+<div class="container">
+	<div class="section-label">// the problem</div>
+	<div class="problem-grid">
+		<div class="problem-col before">
+			<h3><span class="icon">×</span> Without skill-tools</h3>
+			<ul>
+				<li>Skills are undocumented, scattered across repos</li>
+				<li>No way to validate against a spec</li>
+				<li>Agent picks wrong skill, wastes tokens</li>
+				<li>Hardcoded secrets leak into prompts</li>
+				<li>Manual OpenAPI → skill conversion</li>
+			</ul>
+		</div>
+		<div class="problem-col after">
+			<h3><span class="icon">→</span> With skill-tools</h3>
+			<ul>
+				<li>Portable SKILL.md format, one file per skill</li>
+				<li>Validate, lint, score in CI — like ESLint for skills</li>
+				<li>BM25 routes queries to the right skill instantly</li>
+				<li>8 lint rules catch secrets and hardcoded paths</li>
+				<li>Auto-generate from OpenAPI 3.x specs</li>
+			</ul>
+		</div>
+	</div>
+</div>
+</section>
+
+<style>
+	.problem-section { padding: 0; }
+
+	.problem-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 2rem;
+	}
+
+	.problem-col h3 {
+		font-size: 0.82rem;
+		font-weight: 600;
+		margin-bottom: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.icon { font-style: normal; font-size: 0.9rem; }
+
+	.before h3 { color: var(--muted); }
+	.after h3 { color: var(--blue); }
+
+	.problem-col ul {
+		list-style: none;
+		font-family: var(--font-body);
+		font-size: 0.82rem;
+		color: var(--muted);
+		line-height: 1.8;
+	}
+
+	.problem-col ul li::before {
+		content: '—';
+		margin-right: 0.5rem;
+		color: var(--dim);
+	}
+
+	@media (max-width: 768px) {
+		.problem-grid { grid-template-columns: 1fr; }
+	}
+</style>
