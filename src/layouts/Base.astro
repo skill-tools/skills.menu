@@ -1,4 +1,6 @@
 ---
+import Analytics from '@vercel/analytics/astro';
+
 interface Props {
 	title: string;
 	description?: string;
@@ -67,6 +69,7 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 		</footer>
 
 		<script src="/webgl-bg.js" is:inline></script>
+		<Analytics />
 	</body>
 </html>
 
