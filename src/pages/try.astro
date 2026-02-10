@@ -1,0 +1,1154 @@
+---
+import Base from '../layouts/Base.astro';
+
+const sampleSkill = `---
+name: deploy-vercel
+description: >-
+  Deploy applications to Vercel.
+  Use when pushing code to production.
+version: "1.0"
+---
+
+# Deploy to Vercel
+
+## Prerequisites
+- Vercel CLI installed
+- \`vercel.json\` in project root
+
+## Steps
+1. Run \`vercel login\`
+2. Run \`vercel --prod\`
+3. Verify the deployment URL
+
+## Error Handling
+Check build logs if deployment fails.
+Look for missing environment variables.`;
+---
+
+<Base title="Try It — skills.menu" description="Run parse, lint, score, and route on any SKILL.md file right in your browser.">
+	<div class="try-page">
+		<h1>Try It</h1>
+		<p>Paste a SKILL.md below and run any tool. Everything runs in your browser — nothing leaves the page.</p>
+
+		<div class="try-layout">
+			<div class="input-panel">
+				<div class="panel-header">
+					<span class="panel-label">SKILL.md</span>
+					<button id="btn-sample" class="btn-small" title="Load sample">sample</button>
+				</div>
+				<textarea id="skill-input" spellcheck="false" placeholder="Paste your SKILL.md content here...">{sampleSkill}</textarea>
+			</div>
+			<div class="output-panel">
+				<div class="tool-bar">
+					<button class="tool-btn" data-tool="parse">parse</button>
+					<button class="tool-btn" data-tool="lint">lint</button>
+					<button class="tool-btn" data-tool="score">score</button>
+					<button class="tool-btn" data-tool="route">route</button>
+				</div>
+				<div class="terminal" id="output-terminal">
+					<div class="terminal-bar">
+						<span class="tdot tdot-r"></span>
+						<span class="tdot tdot-y"></span>
+						<span class="tdot tdot-g"></span>
+						<span class="tfile" id="terminal-title">output</span>
+					</div>
+					<pre id="output"><span class="t-c">← pick a tool to run</span></pre>
+				</div>
+			</div>
+		</div>
+
+		<div id="route-section" style="display:none;">
+			<div class="route-input-row">
+				<input id="route-query" type="text" placeholder="query to route, e.g. &quot;deploy my app&quot;" />
+				<button id="btn-route-go" class="btn-small">route</button>
+			</div>
+		</div>
+
+		<section class="transparency">
+			<h2>How it works</h2>
+			<p class="transparency-statement">All tools run deterministic code in your browser. No LLMs, no API calls, no data leaves the page.</p>
+
+			<details class="tool-ref">
+				<summary>Parse — validation checks</summary>
+				<div class="ref-body">
+					<p>The parser validates SKILL.md structure against the <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent Skills spec</a>:</p>
+					<table>
+						<thead><tr><th>Check</th><th>Rule</th></tr></thead>
+						<tbody>
+							<tr><td>Frontmatter</td><td>Must exist as YAML between <code>---</code> delimiters</td></tr>
+							<tr><td><code>name</code></td><td>Required. 1-64 chars, lowercase alphanumeric + hyphens. No leading/trailing hyphens, no consecutive hyphens (<code>--</code>)</td></tr>
+							<tr><td><code>description</code></td><td>Required. Max 1,024 characters</td></tr>
+							<tr><td>Body</td><td>Required. Markdown content after frontmatter</td></tr>
+							<tr><td>File references</td><td>Paths starting with <code>scripts/</code>, <code>references/</code>, <code>assets/</code> must resolve to existing files</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</details>
+
+			<details class="tool-ref">
+				<summary>Lint — 8 rules</summary>
+				<div class="ref-body">
+					<table>
+						<thead><tr><th>Rule</th><th>Severity</th><th>What it catches</th></tr></thead>
+						<tbody>
+							<tr>
+								<td><code>no-secrets</code></td>
+								<td><span class="sev-error">error</span></td>
+								<td>11 patterns: <code>sk-*</code> (OpenAI), <code>sk_live_*</code> / <code>sk_test_*</code> (Stripe), <code>ghp_*</code> / <code>gho_*</code> / <code>github_pat_*</code> (GitHub), <code>xoxb-*</code> / <code>xoxp-*</code> (Slack), <code>AKIA*</code> (AWS), <code>-----BEGIN PRIVATE KEY-----</code>, JWT patterns</td>
+							</tr>
+							<tr>
+								<td><code>no-hardcoded-paths</code></td>
+								<td><span class="sev-error">error</span></td>
+								<td><code>/Users/...</code>, <code>/home/...</code>, <code>C:\Users\...</code>, <code>/var/</code>, <code>/tmp/...</code></td>
+							</tr>
+							<tr>
+								<td><code>description-specificity</code></td>
+								<td><span class="sev-warn">warning</span></td>
+								<td>Generic verbs in description: <code>manage</code>, <code>handle</code>, <code>process</code>, <code>deal with</code>, <code>work with</code>, <code>do stuff</code>, <code>help with</code>, <code>assist with</code>, <code>take care of</code></td>
+							</tr>
+							<tr>
+								<td><code>description-trigger-keywords</code></td>
+								<td><span class="sev-warn">warning</span></td>
+								<td>Needs a trigger phrase (<code>use when</code>, <code>use for</code>, <code>invoke when</code>, <code>trigger when</code>) OR an action verb (<code>deploy</code>, <code>test</code>, <code>build</code>, <code>run</code>, <code>create</code>, <code>generate</code>, <code>analyze</code>, <code>review</code>, <code>format</code>, <code>lint</code>, <code>fix</code>, <code>check</code>, <code>commit</code>, <code>push</code>, <code>pull</code>, <code>fetch</code>, <code>install</code>, <code>configure</code>, <code>setup</code>, <code>search</code>, <code>find</code>, <code>list</code>, <code>delete</code>, <code>update</code>, <code>migrate</code>, <code>convert</code>, <code>export</code>, <code>import</code>)</td>
+							</tr>
+							<tr>
+								<td><code>progressive-disclosure</code></td>
+								<td><span class="sev-warn">warning</span></td>
+								<td>>500 lines without <code>references/</code> or <code>scripts/</code> file references</td>
+							</tr>
+							<tr>
+								<td><code>instructions-has-examples</code></td>
+								<td><span class="sev-info">info</span></td>
+								<td>No code blocks (<code>```</code>), inline code (<code>`..`</code>), or numbered steps (<code>1. ...</code>)</td>
+							</tr>
+							<tr>
+								<td><code>instructions-has-error-handling</code></td>
+								<td><span class="sev-info">info</span></td>
+								<td>No error handling heading or keywords (<code>error</code>, <code>fail</code>, <code>troubleshoot</code>, "if X fails", "common issues")</td>
+							</tr>
+							<tr>
+								<td><code>consistent-headings</code></td>
+								<td><span class="sev-info">info</span></td>
+								<td>Heading levels that skip (e.g. H1 directly to H4)</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</details>
+
+			<details class="tool-ref">
+				<summary>Score — 5 dimensions, 100 points</summary>
+				<div class="ref-body">
+					<p>Scores are computed by deterministic code. No LLMs involved.</p>
+
+					<h4>Description Quality <span class="dim-pts">30 pts</span></h4>
+					<ul>
+						<li>Length 50-300 chars = 8 pts &middot; 30-400 = 5 pts &middot; &ge;10 = 2 pts</li>
+						<li>Action verbs: &ge;2 = 8 pts &middot; &ge;1 = 5 pts</li>
+						<li>Trigger phrase ("use when" / "use for" / "invoke when" / "when the user") = 8 pts</li>
+						<li>Name uniqueness: &lt;50% name parts in description = 6 pts &middot; &lt;80% = 3 pts</li>
+					</ul>
+
+					<h4>Instruction Clarity <span class="dim-pts">25 pts</span></h4>
+					<ul>
+						<li>Code blocks: &ge;2 = 7 pts &middot; &ge;1 = 4 pts</li>
+						<li>Numbered steps: &ge;3 = 6 pts &middot; &ge;1 = 3 pts</li>
+						<li>Error handling heading = 6 pts &middot; keywords only = 3 pts</li>
+						<li>Body word count: &ge;100 = 6 pts &middot; &ge;50 = 4 pts &middot; &ge;20 = 2 pts</li>
+					</ul>
+
+					<h4>Spec Compliance <span class="dim-pts">20 pts</span></h4>
+					<ul>
+						<li>Has <code>name</code> = 5 pts</li>
+						<li>Has <code>description</code> = 5 pts</li>
+						<li>&le;5,000 tokens = 5 pts &middot; &le;7,500 = 2 pts</li>
+						<li>&le;500 lines = 5 pts &middot; &le;750 = 2 pts</li>
+					</ul>
+
+					<h4>Progressive Disclosure <span class="dim-pts">15 pts</span></h4>
+					<ul>
+						<li>&le;100 lines = 15 pts (auto-pass)</li>
+						<li>100-500 lines with refs = 15 pts &middot; without = 8 pts</li>
+						<li>>500 lines with refs = 10 pts &middot; without = 2 pts</li>
+					</ul>
+
+					<h4>Security <span class="dim-pts">10 pts</span></h4>
+					<ul>
+						<li>Starts at 10. Any secret pattern = 0 (immediate).</li>
+						<li>Hardcoded paths = &minus;3 &middot; <code>rm -rf /</code> = &minus;2 &middot; <code>curl | bash</code> = &minus;2 &middot; <code>eval $</code> = &minus;2</li>
+						<li>Floor: 0</li>
+					</ul>
+				</div>
+			</details>
+
+			<details class="tool-ref">
+				<summary>Route — BM25 algorithm</summary>
+				<div class="ref-body">
+					<p>Okapi BM25 full-text search. No LLMs, no embeddings, no API calls.</p>
+
+					<h4>Parameters</h4>
+					<table>
+						<thead><tr><th>Param</th><th>Default</th><th>Role</th></tr></thead>
+						<tbody>
+							<tr><td><code>k1</code></td><td>1.2</td><td>Term frequency saturation. Higher = more weight to repeated terms.</td></tr>
+							<tr><td><code>b</code></td><td>0.75</td><td>Length normalization. 0 = ignore length, 1 = fully normalize.</td></tr>
+						</tbody>
+					</table>
+
+					<h4>Formulas</h4>
+					<pre><code>IDF(t) = log((N - df(t) + 0.5) / (df(t) + 0.5) + 1)
+
+score(q, d) = &Sigma; IDF(t) &times; (tf(t,d) &times; (k1 + 1)) / (tf(t,d) + k1 &times; (1 - b + b &times; |d| / avgdl))
+
+normalized = score / max_score   # top result = 1.0</code></pre>
+
+					<h4>Contextual Enrichment <span class="dim-pts">v0.2.0</span></h4>
+					<p>Context terms are extracted deterministically from the skill body and prepended to the description before indexing:</p>
+					<ul>
+						<li><strong>Name parts</strong> — skill name split on <code>-</code> and <code>_</code></li>
+						<li><strong>Section headings</strong> — all markdown headings</li>
+						<li><strong>Inline code refs</strong> — backtick-wrapped terms from body</li>
+					</ul>
+					<p>Max 80 context tokens. Deduped against description to avoid inflating term frequency. Disable with <code>context: false</code>.</p>
+				</div>
+			</details>
+		</section>
+	</div>
+</Base>
+
+<style>
+	.try-page {
+		padding: 3rem 2.5rem 4rem;
+		line-height: 1.7;
+	}
+
+	.try-page h1 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin-bottom: 0.5rem;
+	}
+
+	.try-page > p {
+		font-family: var(--font-body);
+		font-size: 0.85rem;
+		color: var(--muted);
+		margin-bottom: 1.5rem;
+	}
+
+	.try-layout {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	/* Input panel */
+	.input-panel {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.panel-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 0.5rem;
+	}
+
+	.panel-label {
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--dim);
+	}
+
+	.btn-small {
+		font-family: var(--font);
+		font-size: 0.65rem;
+		padding: 0.2rem 0.5rem;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--bg);
+		color: var(--muted);
+		cursor: pointer;
+	}
+
+	.btn-small:hover {
+		border-color: var(--blue);
+		color: var(--blue);
+	}
+
+	#skill-input {
+		font-family: var(--font);
+		font-size: 0.78rem;
+		line-height: 1.7;
+		padding: 1rem;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: var(--bg2);
+		color: var(--text);
+		resize: vertical;
+		min-height: 460px;
+		outline: none;
+		tab-size: 2;
+	}
+
+	#skill-input:focus {
+		border-color: var(--blue);
+	}
+
+	/* Output panel */
+	.output-panel {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.tool-bar {
+		display: flex;
+		gap: 0.4rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.tool-btn {
+		font-family: var(--font);
+		font-size: 0.72rem;
+		font-weight: 500;
+		padding: 0.35rem 0.85rem;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		background: var(--bg);
+		color: var(--muted);
+		cursor: pointer;
+		transition: all 0.12s;
+	}
+
+	.tool-btn:hover {
+		border-color: var(--blue);
+		color: var(--blue);
+	}
+
+	.tool-btn.active {
+		background: var(--blue);
+		color: #fff;
+		border-color: var(--blue);
+	}
+
+	#output-terminal {
+		flex: 1;
+		min-height: 460px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#output-terminal pre {
+		flex: 1;
+		margin: 0;
+		padding: 1rem 1.25rem;
+		font-size: 0.78rem;
+		line-height: 1.8;
+		background: transparent;
+		border: none;
+		color: var(--text);
+		overflow: auto;
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+
+	/* Route query input */
+	#route-section {
+		margin-bottom: 1rem;
+	}
+
+	.route-input-row {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	#route-query {
+		flex: 1;
+		font-family: var(--font);
+		font-size: 0.78rem;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		background: var(--bg2);
+		color: var(--text);
+		outline: none;
+	}
+
+	#route-query:focus {
+		border-color: var(--blue);
+	}
+
+	/* Responsive */
+	@media (max-width: 900px) {
+		.try-layout {
+			grid-template-columns: 1fr;
+		}
+
+		#skill-input {
+			min-height: 280px;
+		}
+
+		#output-terminal {
+			min-height: 300px;
+		}
+	}
+
+	/* Transparency section */
+	.transparency {
+		border-top: 1px solid var(--border);
+		margin-top: 2.5rem;
+		padding-top: 2rem;
+	}
+
+	.transparency h2 {
+		font-size: 1.15rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.transparency-statement {
+		font-family: var(--font-body);
+		font-size: 0.82rem;
+		color: var(--muted);
+		margin-bottom: 1.5rem;
+		line-height: 1.6;
+	}
+
+	.tool-ref {
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		margin-bottom: 0.5rem;
+	}
+
+	.tool-ref summary {
+		padding: 0.65rem 1rem;
+		font-size: 0.82rem;
+		font-weight: 600;
+		cursor: pointer;
+		color: var(--text);
+		list-style: none;
+	}
+
+	.tool-ref summary::before {
+		content: '▸ ';
+		color: var(--dim);
+		font-weight: 400;
+	}
+
+	.tool-ref[open] summary::before {
+		content: '▾ ';
+	}
+
+	.tool-ref summary::-webkit-details-marker { display: none; }
+
+	.ref-body {
+		padding: 0 1rem 1rem;
+		font-size: 0.82rem;
+		line-height: 1.7;
+	}
+
+	.ref-body p {
+		font-family: var(--font-body);
+		color: var(--muted);
+		margin-bottom: 0.75rem;
+		font-size: 0.82rem;
+	}
+
+	.ref-body h4 {
+		font-size: 0.82rem;
+		margin-top: 1rem;
+		margin-bottom: 0.4rem;
+		color: var(--text);
+	}
+
+	.dim-pts {
+		font-weight: 400;
+		color: var(--dim);
+		font-size: 0.75rem;
+	}
+
+	.ref-body ul {
+		margin: 0 0 0.75rem 1.25rem;
+		font-family: var(--font-body);
+		color: var(--muted);
+		font-size: 0.82rem;
+	}
+
+	.ref-body li {
+		margin-bottom: 0.25rem;
+	}
+
+	.ref-body table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 0.75rem;
+		font-size: 0.78rem;
+	}
+
+	.ref-body th {
+		text-align: left;
+		padding: 0.4rem 0.6rem;
+		border-bottom: 2px solid var(--border);
+		color: var(--text);
+		font-weight: 600;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.ref-body td {
+		padding: 0.4rem 0.6rem;
+		border-bottom: 1px solid var(--border);
+		color: var(--muted);
+		font-family: var(--font-body);
+		font-size: 0.78rem;
+		vertical-align: top;
+	}
+
+	.ref-body pre {
+		background: var(--bg2);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 0.75rem 1rem;
+		margin-bottom: 0.75rem;
+		overflow-x: auto;
+		font-size: 0.75rem;
+		line-height: 1.7;
+	}
+
+	.ref-body code {
+		font-family: var(--font);
+		font-size: 0.78rem;
+	}
+
+	.sev-error { color: #dc2626; font-weight: 500; }
+	.sev-warn { color: var(--orange); font-weight: 500; }
+	.sev-info { color: var(--dim); font-weight: 500; }
+
+	@media (max-width: 768px) {
+		.try-page {
+			padding: 1.5rem 1.25rem 2rem;
+		}
+	}
+</style>
+
+<script define:vars={{ sampleSkill }}>
+// ─── YAML FRONTMATTER PARSER ───────────────────────────────────────
+function parseFrontmatter(raw) {
+	const trimmed = raw.trimStart();
+	if (!trimmed.startsWith('---')) return { data: {}, body: raw, raw: raw };
+
+	const end = trimmed.indexOf('\n---', 3);
+	if (end === -1) return { data: {}, body: raw, raw: raw };
+
+	const yamlBlock = trimmed.slice(4, end).trim();
+	const body = trimmed.slice(end + 4).trim();
+	const data = {};
+
+	let currentKey = null;
+	let currentValue = '';
+	let isMultiline = false;
+
+	for (const line of yamlBlock.split('\n')) {
+		const kvMatch = line.match(/^(\w[\w-]*):\s*(.*)/);
+		if (kvMatch && !isMultiline) {
+			if (currentKey) data[currentKey] = cleanYamlValue(currentValue.trim());
+			currentKey = kvMatch[1];
+			const val = kvMatch[2].trim();
+			if (val === '>-' || val === '|' || val === '>') {
+				isMultiline = true;
+				currentValue = '';
+			} else {
+				currentValue = val;
+				isMultiline = false;
+			}
+		} else if (isMultiline && line.match(/^\s+/)) {
+			currentValue += (currentValue ? ' ' : '') + line.trim();
+		} else if (isMultiline) {
+			if (currentKey) data[currentKey] = cleanYamlValue(currentValue.trim());
+			isMultiline = false;
+			const kvMatch2 = line.match(/^(\w[\w-]*):\s*(.*)/);
+			if (kvMatch2) {
+				currentKey = kvMatch2[1];
+				currentValue = kvMatch2[2].trim();
+			}
+		}
+	}
+	if (currentKey) data[currentKey] = cleanYamlValue(currentValue.trim());
+
+	return { data, body, raw };
+}
+
+function cleanYamlValue(v) {
+	if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'")))
+		return v.slice(1, -1);
+	return v;
+}
+
+// ─── SECTION PARSER ────────────────────────────────────────────────
+function parseSections(body) {
+	const lines = body.split('\n');
+	const sections = [];
+	let cur = null;
+
+	for (let i = 0; i < lines.length; i++) {
+		const m = lines[i].match(/^(#{1,6})\s+(.+)$/);
+		if (m) {
+			if (cur) sections.push({ heading: cur.heading, depth: cur.depth, content: cur.lines.join('\n').trim(), line: cur.line });
+			cur = { heading: m[2], depth: m[1].length, line: i + 1, lines: [] };
+		} else if (cur) {
+			cur.lines.push(lines[i]);
+		}
+	}
+	if (cur) sections.push({ heading: cur.heading, depth: cur.depth, content: cur.lines.join('\n').trim(), line: cur.line });
+	return sections;
+}
+
+// ─── FILE REFERENCES ───────────────────────────────────────────────
+function extractFileRefs(body) {
+	const refs = [];
+	const seen = new Set();
+	const pat = /(?:^|\s|`)((?:scripts|references|assets)\/[\w./-]+(?:\.\w+)?)/gm;
+	const lines = body.split('\n');
+	for (let i = 0; i < lines.length; i++) {
+		for (const m of lines[i].matchAll(pat)) {
+			if (!seen.has(m[1])) { seen.add(m[1]); refs.push({ path: m[1], line: i + 1 }); }
+		}
+	}
+	return refs;
+}
+
+// ─── PARSE TOOL ────────────────────────────────────────────────────
+function runParse(raw) {
+	const t0 = performance.now();
+	const { data, body } = parseFrontmatter(raw);
+	const sections = parseSections(body);
+	const fileRefs = extractFileRefs(body);
+	const lineCount = body.split('\n').length;
+	const wordCount = body.split(/\s+/).filter(w => w).length;
+	const elapsed = (performance.now() - t0).toFixed(1);
+
+	const lines = [];
+	lines.push(dim('$ skill-tools parse SKILL.md'));
+	lines.push('');
+
+	// Frontmatter
+	const name = data.name || '(missing)';
+	const desc = data.description || '(missing)';
+	const version = data.version || '(not set)';
+
+	lines.push(blue('Frontmatter'));
+	lines.push(`  name:        ${name}`);
+	lines.push(`  description: ${desc.length > 60 ? desc.slice(0, 60) + '…' : desc}`);
+	lines.push(`  version:     ${version}`);
+
+	const extra = Object.keys(data).filter(k => !['name', 'description', 'version'].includes(k));
+	if (extra.length) lines.push(`  extra fields: ${extra.join(', ')}`);
+
+	lines.push('');
+	lines.push(blue('Body'));
+	lines.push(`  ${lineCount} lines, ${wordCount} words`);
+
+	lines.push('');
+	lines.push(blue('Sections'));
+	if (sections.length === 0) {
+		lines.push(orange('  (none)'));
+	} else {
+		for (const s of sections) {
+			lines.push(`  ${'  '.repeat(s.depth - 1)}${dim('H' + s.depth)} ${s.heading}`);
+		}
+	}
+
+	if (fileRefs.length > 0) {
+		lines.push('');
+		lines.push(blue('File References'));
+		for (const r of fileRefs) lines.push(`  ${r.path} ${dim('line ' + r.line)}`);
+	}
+
+	// Diagnostics
+	const diags = [];
+	if (!data.name) diags.push({ sev: 'error', msg: 'Missing required field: name' });
+	if (!data.description) diags.push({ sev: 'error', msg: 'Missing required field: description' });
+	if (body.length === 0) diags.push({ sev: 'error', msg: 'No markdown body after frontmatter' });
+	if (data.name && !/^[a-z0-9][a-z0-9-]{0,62}[a-z0-9]?$/.test(data.name))
+		diags.push({ sev: 'error', msg: `Invalid name format: "${data.name}"` });
+	if (data.description && data.description.length > 1024)
+		diags.push({ sev: 'error', msg: `Description too long (${data.description.length} chars, max 1024)` });
+
+	if (diags.length > 0) {
+		lines.push('');
+		lines.push(blue('Diagnostics'));
+		for (const d of diags) {
+			lines.push(`  ${d.sev === 'error' ? red('✗') : orange('⚠')} ${d.msg}`);
+		}
+	}
+
+	const ok = diags.filter(d => d.sev === 'error').length === 0;
+	lines.push('');
+	lines.push(ok ? green('✓ parse ok') : red('✗ parse failed'));
+	lines.push(dim(`  ${elapsed}ms`));
+
+	return lines.join('\n');
+}
+
+// ─── LINT TOOL ─────────────────────────────────────────────────────
+function runLint(raw) {
+	const t0 = performance.now();
+	const { data, body } = parseFrontmatter(raw);
+	const sections = parseSections(body);
+	const fileRefs = extractFileRefs(body);
+	const lineCount = body.split('\n').length;
+	const diags = [];
+
+	// no-hardcoded-paths (error)
+	const pathPat = /(?:\/Users\/\w+|\/home\/\w+|[A-Z]:\\\\?Users\\\\?\w+|\/var\/|\/tmp\/\w+)/;
+	body.split('\n').forEach((line, i) => {
+		if (pathPat.test(line))
+			diags.push({ rule: 'no-hardcoded-paths', sev: 'error', msg: `Hardcoded path on line ${i + 1}`, line: i + 1 });
+	});
+
+	// no-secrets (error)
+	const secretPats = [
+		[/sk-[a-zA-Z0-9]{20,}/, 'OpenAI key'],
+		[/sk_live_[a-zA-Z0-9]{20,}/, 'Stripe live key'],
+		[/sk_test_[a-zA-Z0-9]{20,}/, 'Stripe test key'],
+		[/ghp_[a-zA-Z0-9]{36,}/, 'GitHub PAT'],
+		[/gho_[a-zA-Z0-9]{36,}/, 'GitHub OAuth'],
+		[/github_pat_[a-zA-Z0-9_]{20,}/, 'GitHub fine-grained PAT'],
+		[/xoxb-[a-zA-Z0-9-]+/, 'Slack bot token'],
+		[/xoxp-[a-zA-Z0-9-]+/, 'Slack user token'],
+		[/AKIA[0-9A-Z]{16}/, 'AWS access key'],
+		[/-----BEGIN (?:RSA |EC )?PRIVATE KEY-----/, 'Private key'],
+		[/eyJ[a-zA-Z0-9_-]{20,500}\.[a-zA-Z0-9_-]{20,500}\./, 'JWT'],
+	];
+	raw.split('\n').forEach((line, i) => {
+		for (const [pat, label] of secretPats) {
+			if (pat.test(line)) {
+				diags.push({ rule: 'no-secrets', sev: 'error', msg: `Possible ${label} on line ${i + 1}`, line: i + 1 });
+				break;
+			}
+		}
+	});
+
+	// description-specificity (warning)
+	if (data.description) {
+		const desc = data.description.toLowerCase();
+		const generic = ['manage', 'handle', 'process', 'deal with', 'work with', 'do stuff', 'help with', 'assist with', 'take care of'];
+		const found = generic.filter(g => desc.includes(g));
+		if (found.length > 0)
+			diags.push({ rule: 'description-specificity', sev: 'warning', msg: `Generic verbs: ${found.join(', ')}. Use specific action verbs instead` });
+	}
+
+	// description-trigger-keywords (warning)
+	if (data.description) {
+		const trig = /\buse when\b|\buse for\b|\buse this\b|\binvoke when\b|\btrigger when\b/i;
+		const action = /\b(deploy|test|build|run|create|generate|analyze|review|format|lint|fix|check|commit|push|pull|fetch|install|configure|setup|search|find|list|delete|update|migrate|convert|export|import)\b/i;
+		if (!trig.test(data.description) && !action.test(data.description))
+			diags.push({ rule: 'description-trigger-keywords', sev: 'warning', msg: 'No trigger phrase or action verb in description' });
+	}
+
+	// instructions-has-examples (info)
+	const hasCode = /```[\s\S]*?```/.test(body);
+	const hasExample = /^#{1,3}\s+(?:example|usage|demo)/im.test(body);
+	const hasInline = /`[^`]+`/.test(body);
+	const hasSteps = /^\d+\.\s+/m.test(body);
+	if (!hasCode && !hasExample && !hasInline && !hasSteps)
+		diags.push({ rule: 'instructions-has-examples', sev: 'info', msg: 'No code blocks, inline code, or numbered steps found' });
+
+	// instructions-has-error-handling (info)
+	const errSection = /#{1,3}\s+(?:error|troubleshoot|fail|issue|problem|debug)/i.test(body);
+	const errKw = /\b(?:error|fail|troubleshoot|if .+ fails|when .+ fails|common issues|known issues)\b/.test(body);
+	if (!errSection && !errKw)
+		diags.push({ rule: 'instructions-has-error-handling', sev: 'info', msg: 'No error handling section or keywords found' });
+
+	// consistent-headings (info)
+	for (let i = 1; i < sections.length; i++) {
+		if (sections[i].depth > sections[i - 1].depth + 1)
+			diags.push({ rule: 'consistent-headings', sev: 'info', msg: `"${sections[i].heading}" (H${sections[i].depth}) skips from "${sections[i - 1].heading}" (H${sections[i - 1].depth})` });
+	}
+
+	// progressive-disclosure (warning)
+	if (lineCount > 500) {
+		const hasRefs = fileRefs.some(r => r.path.startsWith('references/') || r.path.startsWith('scripts/'));
+		if (!hasRefs)
+			diags.push({ rule: 'progressive-disclosure', sev: 'warning', msg: `${lineCount} lines without references/ or scripts/ — consider splitting` });
+	}
+
+	const elapsed = (performance.now() - t0).toFixed(1);
+	const errors = diags.filter(d => d.sev === 'error').length;
+	const warnings = diags.filter(d => d.sev === 'warning').length;
+	const infos = diags.filter(d => d.sev === 'info').length;
+
+	const lines = [];
+	lines.push(dim('$ skill-tools lint SKILL.md'));
+	lines.push('');
+
+	if (diags.length === 0) {
+		lines.push(green('✓ 8/8 rules passed — no issues'));
+	} else {
+		for (const d of diags) {
+			const icon = d.sev === 'error' ? red('✗') : d.sev === 'warning' ? orange('⚠') : dim('ℹ');
+			lines.push(`${icon} ${dim(d.rule)}`);
+			lines.push(`  ${d.msg}`);
+		}
+		lines.push('');
+		const parts = [];
+		if (errors > 0) parts.push(red(`${errors} error${errors > 1 ? 's' : ''}`));
+		if (warnings > 0) parts.push(orange(`${warnings} warning${warnings > 1 ? 's' : ''}`));
+		if (infos > 0) parts.push(dim(`${infos} info`));
+		lines.push(parts.join('  '));
+	}
+
+	lines.push(dim(`  ${elapsed}ms`));
+	return lines.join('\n');
+}
+
+// ─── SCORE TOOL ────────────────────────────────────────────────────
+function runScore(raw) {
+	const t0 = performance.now();
+	const { data, body } = parseFrontmatter(raw);
+	const sections = parseSections(body);
+	const fileRefs = extractFileRefs(body);
+	const lineCount = body.split('\n').length;
+	const wordCount = body.split(/\s+/).filter(w => w).length;
+
+	// Description Quality (30)
+	let descScore = 0;
+	const desc = data.description || '';
+	if (desc.length >= 50 && desc.length <= 300) descScore += 8;
+	else if (desc.length >= 30 && desc.length <= 400) descScore += 5;
+	else if (desc.length >= 10) descScore += 2;
+
+	const actionVerbs = /\b(deploy|test|build|run|create|generate|analyze|review|format|lint|fix|check|commit|push|pull|fetch|install|configure|search|find|list|delete|update|migrate|convert|export|import)\b/gi;
+	const verbCount = (desc.match(actionVerbs) || []).length;
+	if (verbCount >= 2) descScore += 8;
+	else if (verbCount >= 1) descScore += 5;
+
+	if (/\buse when\b|\buse for\b|\buse this\b|\binvoke when\b|\bwhen the user\b/i.test(desc)) descScore += 8;
+
+	if (data.name) {
+		const nameParts = data.name.split('-').filter(w => w.length > 2);
+		const inDesc = nameParts.filter(w => desc.toLowerCase().includes(w.toLowerCase())).length;
+		const ratio = nameParts.length > 0 ? inDesc / nameParts.length : 0;
+		if (ratio < 0.5) descScore += 6;
+		else if (ratio < 0.8) descScore += 3;
+	}
+	descScore = Math.min(descScore, 30);
+
+	// Instruction Clarity (25)
+	let instrScore = 0;
+	const codeBlocks = (body.match(/```[\s\S]*?```/g) || []).length;
+	if (codeBlocks >= 2) instrScore += 7;
+	else if (codeBlocks >= 1) instrScore += 4;
+
+	const steps = (body.match(/^\d+\.\s+/gm) || []).length;
+	if (steps >= 3) instrScore += 6;
+	else if (steps >= 1) instrScore += 3;
+
+	if (/#{1,3}\s+(?:error|troubleshoot|fail|issue|problem|debug)/i.test(body)) instrScore += 6;
+	else if (/\b(?:error|fail|troubleshoot|if .+ fails|when .+ fails|common issues)\b/i.test(body)) instrScore += 3;
+
+	if (wordCount >= 100) instrScore += 6;
+	else if (wordCount >= 50) instrScore += 4;
+	else if (wordCount >= 20) instrScore += 2;
+	instrScore = Math.min(instrScore, 25);
+
+	// Spec Compliance (20)
+	let specScore = 0;
+	if (data.name) specScore += 5;
+	if (data.description) specScore += 5;
+	// Approximate token count (words * 1.3)
+	const approxTokens = Math.round(raw.split(/\s+/).length * 1.3);
+	if (approxTokens <= 5000) specScore += 5;
+	else if (approxTokens <= 7500) specScore += 2;
+	if (lineCount <= 500) specScore += 5;
+	else if (lineCount <= 750) specScore += 2;
+	specScore = Math.min(specScore, 20);
+
+	// Progressive Disclosure (15)
+	let disclosureScore = 0;
+	const hasRefs = fileRefs.some(r => r.path.startsWith('references/') || r.path.startsWith('scripts/'));
+	if (lineCount <= 100) disclosureScore = 15;
+	else if (lineCount <= 500) { disclosureScore = hasRefs ? 15 : 8; }
+	else { disclosureScore = hasRefs ? 10 : 2; }
+	disclosureScore = Math.min(disclosureScore, 15);
+
+	// Security (10)
+	let secScore = 10;
+	const secretPats = [
+		/sk-[a-zA-Z0-9]{20,}/, /sk_live_[a-zA-Z0-9]{20,}/, /ghp_[a-zA-Z0-9]{36,}/,
+		/AKIA[0-9A-Z]{16}/, /-----BEGIN (?:RSA |EC )?PRIVATE KEY-----/,
+		/eyJ[a-zA-Z0-9_-]{20,500}\.[a-zA-Z0-9_-]{20,500}\./
+	];
+	for (const p of secretPats) { if (p.test(raw)) { secScore = 0; break; } }
+	if (secScore > 0) {
+		const pathPat = /(?:\/Users\/\w+|\/home\/\w+|[A-Z]:\\\\?Users\\\\?\w+|\/var\/|\/tmp\/\w+)/;
+		if (pathPat.test(body)) secScore -= 3;
+		if (/\brm\s+-rf\s+\/(?!\s)/.test(body)) secScore -= 2;
+		if (/\bcurl\s+.*\|\s*(?:bash|sh)\b/.test(body)) secScore -= 2;
+		if (/\beval\s+\$/.test(body)) secScore -= 2;
+		secScore = Math.max(0, secScore);
+	}
+
+	const total = descScore + instrScore + specScore + disclosureScore + secScore;
+	const elapsed = (performance.now() - t0).toFixed(1);
+
+	const lines = [];
+	lines.push(dim('$ skill-tools score SKILL.md'));
+	lines.push('');
+
+	function bar(score, max) {
+		const pct = max > 0 ? score / max : 0;
+		const w = 20;
+		const filled = Math.round(pct * w);
+		return dim('▮'.repeat(filled) + '▯'.repeat(w - filled));
+	}
+
+	function scoreColor(s, max) {
+		const pct = max > 0 ? s / max : 0;
+		if (pct >= 0.85) return green(s + '/' + max);
+		if (pct >= 0.6) return blue(s + '/' + max);
+		if (pct >= 0.4) return orange(s + '/' + max);
+		return red(s + '/' + max);
+	}
+
+	const dims = [
+		['Description', descScore, 30],
+		['Clarity', instrScore, 25],
+		['Spec', specScore, 20],
+		['Disclosure', disclosureScore, 15],
+		['Security', secScore, 10],
+	];
+
+	for (const [label, s, max] of dims) {
+		lines.push(`  ${label.padEnd(12)} ${bar(s, max)}  ${scoreColor(s, max)}`);
+	}
+
+	lines.push('');
+	const totalColor = total >= 85 ? green : total >= 70 ? blue : total >= 55 ? orange : red;
+	lines.push(`  Total: ${totalColor(total + '/100')}`);
+	lines.push(dim(`  ${elapsed}ms`));
+
+	return lines.join('\n');
+}
+
+// ─── ROUTE TOOL ────────────────────────────────────────────────────
+// Minimal BM25 in browser
+const STOP_WORDS = new Set('a an the is are was were be been being have has had do does did will would could should may might shall can must to of in for on with at by from as into through during before after above below between out off over under again further then once here there when where why how all each every both few more most other some such no nor not only own same so than too very and but or if it its this that these those he she they we you i me my your his her their our what which who whom'.split(' '));
+
+function tokenize(text) {
+	return text.toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter(t => t.length > 1 && !STOP_WORDS.has(t));
+}
+
+let bm25Docs = [];
+let bm25Index = new Map();
+let bm25Idf = new Map();
+let bm25Avgdl = 0;
+
+function bm25Add(entries) {
+	bm25Docs = [];
+	bm25Index = new Map();
+	bm25Idf = new Map();
+	let totalLen = 0;
+
+	for (const entry of entries) {
+		const tokens = tokenize(entry.text);
+		const docIdx = bm25Docs.length;
+		bm25Docs.push({ id: entry.id, length: tokens.length, desc: entry.desc });
+		totalLen += tokens.length;
+		const tf = new Map();
+		for (const t of tokens) tf.set(t, (tf.get(t) || 0) + 1);
+		for (const [term, freq] of tf) {
+			if (!bm25Index.has(term)) bm25Index.set(term, []);
+			bm25Index.get(term).push({ docIdx, tf: freq });
+		}
+	}
+
+	bm25Avgdl = bm25Docs.length > 0 ? totalLen / bm25Docs.length : 0;
+	const N = bm25Docs.length;
+	for (const [term, postings] of bm25Index) {
+		bm25Idf.set(term, Math.log((N - postings.length + 0.5) / (postings.length + 0.5) + 1));
+	}
+}
+
+function bm25Search(query, topK) {
+	if (bm25Docs.length === 0) return [];
+	const tokens = tokenize(query);
+	if (tokens.length === 0) return [];
+
+	const scores = new Float64Array(bm25Docs.length);
+	const k1 = 1.2, b = 0.75;
+	let hasScores = false;
+
+	for (const token of tokens) {
+		const idf = bm25Idf.get(token);
+		if (!idf || idf <= 0) continue;
+		const postings = bm25Index.get(token);
+		if (!postings) continue;
+		for (const p of postings) {
+			const docLen = bm25Docs[p.docIdx].length;
+			const num = p.tf * (k1 + 1);
+			const den = p.tf + k1 * (1 - b + b * (docLen / bm25Avgdl));
+			scores[p.docIdx] += idf * (num / den);
+			hasScores = true;
+		}
+	}
+
+	if (!hasScores) return [];
+	let maxScore = 0;
+	for (let i = 0; i < scores.length; i++) if (scores[i] > maxScore) maxScore = scores[i];
+	if (maxScore === 0) return [];
+
+	const results = [];
+	for (let i = 0; i < scores.length; i++) {
+		if (scores[i] > 0) results.push({ skill: bm25Docs[i].id, score: scores[i] / maxScore, desc: bm25Docs[i].desc });
+	}
+	results.sort((a, b) => b.score - a.score);
+	return results.slice(0, topK);
+}
+
+// Context extraction (contextual BM25)
+function extractContextTerms(skill) {
+	const terms = [];
+	// Name parts
+	skill.name.split(/[-_]/).filter(p => p.length > 1).forEach(p => terms.push(p.toLowerCase()));
+	// Section headings
+	if (skill.sections) {
+		for (const s of skill.sections) {
+			s.heading.toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter(w => w.length > 1).forEach(w => terms.push(w));
+		}
+	}
+	// Inline code refs
+	if (skill.body) {
+		for (const m of skill.body.matchAll(/`([^`\n]+)`/g)) {
+			m[1].trim().split(/\s+/).map(p => p.replace(/^-+/, '').toLowerCase()).filter(p => p.length > 1).forEach(p => terms.push(p));
+		}
+	}
+	// Dedup against description
+	const descTokens = new Set(skill.description.toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/));
+	const seen = new Set();
+	const unique = [];
+	for (const t of terms) {
+		const l = t.toLowerCase();
+		if (l.length < 2 || seen.has(l) || descTokens.has(l)) continue;
+		seen.add(l);
+		unique.push(l);
+		if (unique.length >= 80) break;
+	}
+	return unique.join(' ');
+}
+
+function runRoute(raw, query) {
+	const t0 = performance.now();
+	const { data, body } = parseFrontmatter(raw);
+	const sections = parseSections(body);
+	const name = data.name || 'unnamed';
+	const desc = data.description || '';
+
+	// Build context-enriched text
+	const skill = { name, description: desc, body, sections };
+	const ctx = extractContextTerms(skill);
+	const enrichedText = ctx ? ctx + ' ' + desc : desc;
+
+	// Index the skill
+	bm25Add([{ id: name, text: enrichedText, desc }]);
+
+	if (!query) {
+		const lines = [];
+		lines.push(dim('$ skill-tools route'));
+		lines.push('');
+		lines.push(blue('Indexed'));
+		lines.push(`  1 skill: ${green(name)}`);
+		if (ctx) {
+			lines.push('');
+			lines.push(blue('Context (v0.2.0 — contextual BM25)'));
+			lines.push(`  ${dim(ctx.length > 80 ? ctx.slice(0, 80) + '…' : ctx)}`);
+		}
+		lines.push('');
+		lines.push(dim('type a query below and hit route'));
+		lines.push(dim(`  ${(performance.now() - t0).toFixed(1)}ms`));
+		return lines.join('\n');
+	}
+
+	const results = bm25Search(query, 5);
+	const elapsed = (performance.now() - t0).toFixed(1);
+
+	const lines = [];
+	lines.push(dim(`$ skill-tools route "${query}"`));
+	lines.push('');
+
+	if (results.length === 0) {
+		lines.push(orange('no matches'));
+	} else {
+		for (let i = 0; i < results.length; i++) {
+			const r = results[i];
+			const bar = '█'.repeat(Math.round(r.score * 20)) + dim('░'.repeat(20 - Math.round(r.score * 20)));
+			lines.push(`  ${dim('#' + (i + 1))} ${r.skill.padEnd(24)} ${bar}  ${r.score.toFixed(3)}`);
+		}
+	}
+
+	lines.push('');
+	lines.push(dim(`  ${elapsed}ms`));
+	return lines.join('\n');
+}
+
+// ─── HTML COLORING HELPERS ─────────────────────────────────────────
+function dim(s) { return `<span class="t-c">${esc(s)}</span>`; }
+function blue(s) { return `<span style="color:var(--blue)">${esc(s)}</span>`; }
+function green(s) { return `<span style="color:var(--green)">${esc(s)}</span>`; }
+function red(s) { return `<span style="color:#dc2626">${esc(s)}</span>`; }
+function orange(s) { return `<span style="color:var(--orange)">${esc(s)}</span>`; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+// ─── UI WIRING ─────────────────────────────────────────────────────
+const input = document.getElementById('skill-input');
+const output = document.getElementById('output');
+const termTitle = document.getElementById('terminal-title');
+const routeSection = document.getElementById('route-section');
+const routeQuery = document.getElementById('route-query');
+const routeBtn = document.getElementById('btn-route-go');
+const sampleBtn = document.getElementById('btn-sample');
+let activeTool = null;
+
+document.querySelectorAll('.tool-btn').forEach(btn => {
+	btn.addEventListener('click', () => {
+		document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+		btn.classList.add('active');
+		activeTool = btn.dataset.tool;
+
+		const raw = input.value;
+		termTitle.textContent = activeTool;
+
+		if (activeTool === 'route') {
+			routeSection.style.display = 'block';
+			output.innerHTML = runRoute(raw, '');
+		} else {
+			routeSection.style.display = 'none';
+			if (activeTool === 'parse') output.innerHTML = runParse(raw);
+			else if (activeTool === 'lint') output.innerHTML = runLint(raw);
+			else if (activeTool === 'score') output.innerHTML = runScore(raw);
+		}
+	});
+});
+
+routeBtn.addEventListener('click', () => {
+	const raw = input.value;
+	const q = routeQuery.value.trim();
+	if (q) output.innerHTML = runRoute(raw, q);
+});
+
+routeQuery.addEventListener('keydown', (e) => {
+	if (e.key === 'Enter') {
+		const raw = input.value;
+		const q = routeQuery.value.trim();
+		if (q) output.innerHTML = runRoute(raw, q);
+	}
+});
+
+sampleBtn.addEventListener('click', () => {
+	input.value = sampleSkill;
+	if (activeTool) {
+		document.querySelector(`.tool-btn[data-tool="${activeTool}"]`).click();
+	}
+});
+</script>

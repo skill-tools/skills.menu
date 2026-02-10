@@ -107,6 +107,19 @@ const results = await router.select('deploy my app');
   bm25: &#123; k1: 1.5, b: 0.8 &#125;,
 &#125;);</code></pre>
 
+	<h2>Contextual Enrichment <em>(v0.2.0)</em></h2>
+	<p>
+		Before indexing, context terms are extracted deterministically from the skill body and prepended to the description.
+		This improves recall for queries that match terms in the skill's instructions, headings, or inline code — without needing LLMs or embeddings.
+	</p>
+	<ul>
+		<li><strong>Name parts</strong> — skill name split on <code>-</code> and <code>_</code></li>
+		<li><strong>Section headings</strong> — all markdown headings from the body</li>
+		<li><strong>Inline code refs</strong> — backtick-wrapped terms from the body</li>
+	</ul>
+	<p>Max 80 context tokens. Deduped against description tokens to avoid inflating term frequency. Disable with <code>context: false</code>:</p>
+	<pre><code>const router = new SkillRouter(&#123; context: false &#125;);</code></pre>
+
 	<h2>Embedding Providers (Advanced)</h2>
 	<p>By default, the router uses BM25 full-text search (zero dependencies). For custom semantic search, you can provide your own embedding function:</p>
 
@@ -132,6 +145,19 @@ const results = await router.select('deploy my app');
 		<li>Dual-path: BM25 default, embedding + vector store fallback for custom providers</li>
 	</ul>
 
+	<h3>BM25 Scoring Formulas</h3>
+	<pre><code>IDF(t) = log((N - df(t) + 0.5) / (df(t) + 0.5) + 1)
+
+score(q, d) = &Sigma; IDF(t) &times; (tf(t,d) &times; (k1 + 1))
+              / (tf(t,d) + k1 &times; (1 - b + b &times; |d| / avgdl))
+
+normalized = score / max_score   // top result = 1.0</code></pre>
+	<p>
+		Where <code>N</code> = total documents, <code>df(t)</code> = documents containing term <code>t</code>,
+		<code>tf(t,d)</code> = frequency of <code>t</code> in document <code>d</code>,
+		<code>|d|</code> = document length in tokens, <code>avgdl</code> = average document length.
+	</p>
+
 	<h2>BM25Index (Direct Use)</h2>
 	<p>The BM25 engine is also exported for standalone use:</p>
 	<pre><code>import &#123; BM25Index &#125; from '@skill-tools/router';
@@ -142,4 +168,74 @@ index.add('doc-2', 'Run unit tests with Vitest');
 
 const results = index.search('deploy', &#123; topK: 5 &#125;);
 // [&#123; id: 'doc-1', score: 1.0 &#125;]</code></pre>
+
+	<h2>Test Coverage</h2>
+	<p>64 tests across 6 suites. Run with <code>npx vitest run</code> from the package directory.</p>
+
+	<h3><code>router.test.ts</code> (18 tests)</h3>
+	<ul>
+		<li>Initializes with zero count, indexes skills, handles empty lists</li>
+		<li>Selects relevant skills for a query</li>
+		<li>Respects topK and threshold options</li>
+		<li>Applies boost and exclude filters (including wildcard patterns)</li>
+		<li>Returns metadata in selection results</li>
+		<li>Saves, loads, and restores from snapshots (load + fromSnapshot)</li>
+		<li>Detects conflicting skills</li>
+		<li>Uses custom embedding providers, throws for unsupported ones</li>
+		<li>Result scores are between 0 and 1, correct shape</li>
+	</ul>
+
+	<h3><code>bm25.test.ts</code> (17 tests)</h3>
+	<ul>
+		<li>Starts empty, adds documents, reports correct size</li>
+		<li>Ranks deploy, test, and database queries correctly</li>
+		<li>Normalizes scores to [0, 1] range</li>
+		<li>Respects topK limit and threshold filter</li>
+		<li>Removes documents by ID</li>
+		<li>Serializes and deserializes round-trip</li>
+		<li>Returns empty for empty query and no-match queries</li>
+		<li>Accepts custom k1 and b parameters</li>
+		<li>Preserves document metadata, handles single-document and incremental adds</li>
+	</ul>
+
+	<h3><code>context-extractor.test.ts</code> (11 tests)</h3>
+	<ul>
+		<li>Returns empty string for skills with no body or sections</li>
+		<li>Extracts inline code references, section headings, key terms from content</li>
+		<li>Splits skill name on hyphens and underscores</li>
+		<li>Deduplicates against description terms and within extracted terms</li>
+		<li>Handles empty body and sections gracefully</li>
+		<li>Truncates to max ~80 tokens</li>
+		<li>Strips leading dashes from code refs, filters single-character name parts</li>
+	</ul>
+
+	<h3><code>contextual-routing.test.ts</code> (10 tests)</h3>
+	<ul>
+		<li>Body terms improve ranking for specific queries</li>
+		<li>AWS-specific, jest-specific, and biome-specific terms route correctly</li>
+		<li>context: false disables enrichment</li>
+		<li>Skills without body/sections behave identically to v0.1</li>
+		<li>Original metadata.description preserved in results</li>
+		<li>Correct count after indexing, save/load round-trip</li>
+		<li>Mixed skills (some with body, some without)</li>
+	</ul>
+
+	<h3><code>memory-store.test.ts</code> (10 tests)</h3>
+	<ul>
+		<li>Starts empty, adds entries, reports size</li>
+		<li>Searches by cosine similarity</li>
+		<li>Respects topK limit and similarity threshold</li>
+		<li>Removes entries, serializes/deserializes</li>
+		<li>Throws on unsupported version and dimension mismatch</li>
+		<li>Preserves metadata through search results</li>
+	</ul>
+
+	<h3><code>local-embedding.test.ts</code> (8 tests)</h3>
+	<ul>
+		<li>Returns vectors of configured dimension, defaults to 256</li>
+		<li>Produces L2-normalized vectors, zero vector for empty text</li>
+		<li>Embeds multiple texts in batch</li>
+		<li>Produces similar vectors for similar texts</li>
+		<li>buildVocabulary populates IDF values</li>
+	</ul>
 </Docs>

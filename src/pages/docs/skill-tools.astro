@@ -33,92 +33,94 @@ skill-tools score ./my-skill/ --min-score 60</code></pre>
 	<p>Runs validate + lint + score in one pass. Ideal for CI/CD.</p>
 
 	<h2>Lint Rules</h2>
+	<p>All rules are deterministic pattern matching. No LLMs involved. Severity can be overridden via <code>.skill-toolsrc.yml</code>.</p>
 	<table>
 		<thead>
 			<tr>
 				<th>Rule</th>
 				<th>Default</th>
-				<th>Description</th>
+				<th>What it catches</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
-				<td><code>description-specificity</code></td>
-				<td>warn</td>
-				<td>No generic verbs ("manage", "handle")</td>
-			</tr>
-			<tr>
-				<td><code>description-trigger-keywords</code></td>
-				<td>warn</td>
-				<td>Has action verbs or "Use when..."</td>
-			</tr>
-			<tr>
-				<td><code>progressive-disclosure</code></td>
-				<td>warn</td>
-				<td>Large files use <code>references/</code></td>
+				<td><code>no-secrets</code></td>
+				<td>error</td>
+				<td>11 token patterns: <code>sk-*</code> (OpenAI), <code>sk_live_*</code> / <code>sk_test_*</code> (Stripe), <code>ghp_*</code> / <code>gho_*</code> / <code>github_pat_*</code> (GitHub), <code>xoxb-*</code> / <code>xoxp-*</code> (Slack), <code>AKIA*</code> (AWS), <code>-----BEGIN PRIVATE KEY-----</code>, JWT patterns</td>
 			</tr>
 			<tr>
 				<td><code>no-hardcoded-paths</code></td>
 				<td>error</td>
-				<td>No <code>/Users/...</code> or <code>C:\</code> paths</td>
+				<td><code>/Users/...</code>, <code>/home/...</code>, <code>C:\Users\...</code>, <code>/var/</code>, <code>/tmp/...</code></td>
 			</tr>
 			<tr>
-				<td><code>no-secrets</code></td>
-				<td>error</td>
-				<td>No API keys, tokens, private keys</td>
+				<td><code>description-specificity</code></td>
+				<td>warn</td>
+				<td>Generic verbs in description: <em>manage, handle, process, deal with, work with, do stuff, help with, assist with, take care of</em></td>
+			</tr>
+			<tr>
+				<td><code>description-trigger-keywords</code></td>
+				<td>warn</td>
+				<td>Needs a trigger phrase (<code>use when</code>, <code>use for</code>, <code>invoke when</code>, <code>trigger when</code>) OR an action verb (deploy, test, build, run, create, generate, analyze, review, format, lint, fix, check, commit, push, pull, fetch, install, configure, setup, search, find, list, delete, update, migrate, convert, export, import)</td>
+			</tr>
+			<tr>
+				<td><code>progressive-disclosure</code></td>
+				<td>warn</td>
+				<td>>500 lines without <code>references/</code> or <code>scripts/</code> file references</td>
 			</tr>
 			<tr>
 				<td><code>instructions-has-examples</code></td>
 				<td>info</td>
-				<td>Has code blocks or numbered steps</td>
+				<td>No code blocks (<code>```</code>), inline code (<code>`..`</code>), or numbered steps (<code>1. ...</code>)</td>
 			</tr>
 			<tr>
 				<td><code>instructions-has-error-handling</code></td>
 				<td>info</td>
-				<td>Mentions error handling</td>
+				<td>No error handling heading or keywords (error, fail, troubleshoot, "if X fails", "common issues")</td>
 			</tr>
 			<tr>
 				<td><code>consistent-headings</code></td>
 				<td>info</td>
-				<td>No skipping heading levels</td>
+				<td>Heading levels that skip (e.g. H1 directly to H4)</td>
 			</tr>
 		</tbody>
 	</table>
 
 	<h2>Score Dimensions</h2>
+	<p>Scores are computed by deterministic code. No LLMs involved. Total: 100 points.</p>
 	<table>
 		<thead>
 			<tr>
 				<th>Dimension</th>
-				<th>Points</th>
-				<th>Key Factors</th>
+				<th>Max</th>
+				<th>Breakdown</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
 				<td>Description Quality</td>
 				<td>30</td>
-				<td>Length, specificity, trigger context, uniqueness</td>
+				<td>Length 50-300 chars (8) &middot; Action verbs &ge;2 (8) &middot; Trigger phrase (8) &middot; Name uniqueness &lt;50% overlap (6)</td>
 			</tr>
 			<tr>
 				<td>Instruction Clarity</td>
 				<td>25</td>
-				<td>Code blocks, steps, error handling, substance</td>
+				<td>Code blocks &ge;2 (7) &middot; Numbered steps &ge;3 (6) &middot; Error handling section (6) &middot; Body &ge;100 words (6)</td>
 			</tr>
 			<tr>
 				<td>Spec Compliance</td>
 				<td>20</td>
-				<td>Name, description, tokens, lines</td>
+				<td>Has name (5) &middot; Has description (5) &middot; &le;5,000 tokens (5) &middot; &le;500 lines (5)</td>
 			</tr>
 			<tr>
 				<td>Progressive Disclosure</td>
 				<td>15</td>
-				<td>File size, use of references/scripts</td>
+				<td>&le;100 lines = 15 auto-pass &middot; 100-500 with refs = 15 &middot; >500 with refs = 10 &middot; >500 without = 2</td>
 			</tr>
 			<tr>
 				<td>Security</td>
 				<td>10</td>
-				<td>No secrets, no hardcoded paths</td>
+				<td>Starts at 10. Secrets = 0 &middot; Hardcoded paths &minus;3 &middot; <code>rm -rf /</code> &minus;2 &middot; <code>curl|bash</code> &minus;2 &middot; <code>eval $</code> &minus;2</td>
 			</tr>
 		</tbody>
 	</table>
@@ -131,9 +133,112 @@ const lintResult = lint(parsedSkill);
 const qualityScore = score(parsedSkill);</code></pre>
 
 	<h2>GitHub Action</h2>
-	<p>Use the skill-tools GitHub Action to validate skills in CI:</p>
+	<p>Use the skill-tools GitHub Action to validate skills in CI. Runs <code>skill-tools check</code> with configurable thresholds.</p>
+
+	<h3>Basic usage</h3>
 	<pre><code>- uses: skill-tools/skill-tools/action@main
   with:
     path: ./skills/
     min-score: 60</code></pre>
+
+	<h3>All inputs</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>Input</th>
+				<th>Default</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>path</code></td>
+				<td><code>.</code></td>
+				<td>Path to skill directory or SKILL.md file</td>
+			</tr>
+			<tr>
+				<td><code>min-score</code></td>
+				<td><code>0</code></td>
+				<td>Minimum quality score (0&ndash;100). Fails if any skill scores below</td>
+			</tr>
+			<tr>
+				<td><code>fail-on</code></td>
+				<td><code>error</code></td>
+				<td>Minimum severity to fail on: <code>error</code>, <code>warning</code>, or <code>info</code></td>
+			</tr>
+			<tr>
+				<td><code>format</code></td>
+				<td><code>text</code></td>
+				<td>Output format: <code>text</code> or <code>json</code></td>
+			</tr>
+			<tr>
+				<td><code>node-version</code></td>
+				<td><code>18</code></td>
+				<td>Node.js version to use</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h3>CI workflow example</h3>
+	<p>Gate pull requests on skill quality:</p>
+	<pre><code>name: Skill Quality
+on: [pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: skill-tools/skill-tools/action@main
+        with:
+          path: ./skills/
+          min-score: 60
+          fail-on: warning</code></pre>
+
+	<h3>Multiple directories</h3>
+	<p>Check skills across your repo by running the action in a matrix:</p>
+	<pre><code>strategy:
+  matrix:
+    skill-path: [./skills/deploy, ./skills/test, ./skills/lint]
+steps:
+  - uses: actions/checkout@v4
+  - uses: skill-tools/skill-tools/action@main
+    with:
+      path: $&#123;&#123; matrix.skill-path &#125;&#125;
+      min-score: 50</code></pre>
+
+	<h3>JSON output for downstream tools</h3>
+	<p>Parse the output with <code>jq</code> or downstream actions:</p>
+	<pre><code>- uses: skill-tools/skill-tools/action@main
+  with:
+    path: ./skills/
+    format: json</code></pre>
+
+	<h2>Test Coverage</h2>
+	<p>14 tests across 3 suites. Run with <code>npx vitest run</code> from the package directory.</p>
+
+	<h3><code>linter.test.ts</code> (5 tests)</h3>
+	<ul>
+		<li>Reports no errors for a well-formed skill</li>
+		<li>Reports specificity warning for vague descriptions</li>
+		<li>Detects secrets in SKILL.md content</li>
+		<li>Detects hardcoded paths</li>
+		<li>Respects rule severity overrides from config</li>
+	</ul>
+
+	<h3><code>scorer.test.ts</code> (5 tests)</h3>
+	<ul>
+		<li>Scores a good skill highly</li>
+		<li>Scores a bad skill lower</li>
+		<li>Penalizes skills with secrets (security dimension)</li>
+		<li>Returns suggestions sorted by point gain</li>
+		<li>Returns score between 0 and 100</li>
+	</ul>
+
+	<h3><code>validator.test.ts</code> (4 tests)</h3>
+	<ul>
+		<li>Validates a good skill as passing</li>
+		<li>Validates a bad skill (still parses since spec-valid)</li>
+		<li>Returns error for non-existent path</li>
+		<li>Validates multiple skills in a directory</li>
+	</ul>
 </Docs>

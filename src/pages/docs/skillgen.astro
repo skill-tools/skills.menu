@@ -123,4 +123,30 @@ if (result.ok) &#123;
 		<li>10MB input size limit on spec files</li>
 		<li>Input validation on CLI arguments</li>
 	</ul>
+
+	<h2>Test Coverage</h2>
+	<p>38 tests across 3 suites. Run with <code>npx vitest run</code> from the package directory.</p>
+
+	<h3><code>generator.test.ts</code> (10 tests)</h3>
+	<ul>
+		<li>Generates skill files from a spec path</li>
+		<li>Returns error for non-existent file</li>
+		<li>Generates per-endpoint files, works with YAML specs</li>
+		<li>Generates from a pre-parsed spec, respects custom name option</li>
+		<li>Generates basic SKILL.md from text, includes instructions, converts to kebab-case, reports token count</li>
+	</ul>
+
+	<h3><code>renderer.test.ts</code> (16 tests)</h3>
+	<ul>
+		<li><strong>Unified mode</strong> &mdash; produces single SKILL.md, includes frontmatter, all endpoints, auth section, error handling, tag grouping, custom name/description, excludes error handling when disabled</li>
+		<li><strong>Per-endpoint mode</strong> &mdash; one file per endpoint, names from operationId, each with frontmatter, parameters table, request body, examples, excludes examples when disabled</li>
+	</ul>
+
+	<h3><code>openapi.test.ts</code> (12 tests)</h3>
+	<ul>
+		<li>Parses JSON and YAML OpenAPI specs</li>
+		<li>Extracts endpoints, parameters, request body, responses, auth schemes, operation tags</li>
+		<li>Throws for non-OpenAPI 3.x documents and empty input</li>
+		<li>Handles specs with no paths and no servers</li>
+	</ul>
 </Docs>
