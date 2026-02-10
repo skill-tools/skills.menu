@@ -99,9 +99,7 @@ const currentPath = Astro.url.pathname;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: 0 1.5rem;
+		padding: 0 2.5rem;
 	}
 
 	.logo {
@@ -133,10 +131,8 @@ const currentPath = Astro.url.pathname;
 		display: grid;
 		grid-template-columns: 220px 1fr;
 		gap: 3rem;
-		padding: 3rem 1.5rem 4rem;
+		padding: 3rem 2.5rem 4rem;
 		min-height: 100vh;
-		max-width: 1000px;
-		margin: 0 auto;
 	}
 
 	.sidebar { position: sticky; top: 4rem; align-self: start; }
@@ -164,7 +160,7 @@ const currentPath = Astro.url.pathname;
 	.sidebar-link:hover { color: var(--text); background: var(--bg2); text-decoration: none; }
 	.sidebar-link.active { color: var(--blue); background: var(--blue-bg); }
 
-	.docs-content { max-width: 700px; line-height: 1.7; }
+	.docs-content { max-width: 900px; line-height: 1.7; }
 
 	.docs-content :global(h1) { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.75rem; }
 	.docs-content :global(h2) { font-size: 1.15rem; margin-top: 3rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
@@ -192,21 +188,20 @@ const currentPath = Astro.url.pathname;
 		align-items: center;
 		font-size: 0.72rem;
 		color: var(--dim);
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: 0 1.5rem;
+		padding: 0 2.5rem;
 	}
 
 	.footer-inner a { color: var(--muted); }
 	.footer-inner a:hover { color: var(--text); }
 
 	@media (max-width: 768px) {
+		.header-inner { padding: 0 1.25rem; }
 		.nav-links { display: none; }
-		.docs-layout { grid-template-columns: 1fr; gap: 1.5rem; padding-top: 2rem; }
+		.docs-layout { grid-template-columns: 1fr; gap: 1.5rem; padding: 2rem 1.25rem 3rem; }
 		.sidebar { position: static; }
 		.sidebar-nav { flex-direction: row; overflow-x: auto; gap: 0.35rem; padding-bottom: 0.5rem; }
 		.sidebar-link { white-space: nowrap; font-size: 0.78rem; }
 		.sidebar-label { display: none; }
-		.footer-inner { flex-direction: column; text-align: center; gap: 0.5rem; }
+		.footer-inner { flex-direction: column; text-align: center; gap: 0.5rem; padding: 0 1.25rem; }
 	}
 </style>

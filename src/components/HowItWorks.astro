@@ -3,84 +3,29 @@
 
 <section class="how-section">
 <div class="container">
-	<div class="section-label">// how it works</div>
-	<div class="flow">
-		<div class="flow-step">
-			<div class="flow-num">1</div>
-			<div class="flow-title">Write or generate</div>
-			<div class="flow-desc">Create SKILL.md files manually or auto-generate from OpenAPI specs and text descriptions.</div>
-			<div class="flow-code">skillgen openapi ./api.yaml</div>
+	<div class="section-label">// usage</div>
+	<div class="terminal">
+		<div class="terminal-bar">
+			<span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
+			<span class="tfile">terminal</span>
 		</div>
-		<div class="flow-step">
-			<div class="flow-num">2</div>
-			<div class="flow-title">Validate and score</div>
-			<div class="flow-desc">Lint for secrets, validate against the spec, and get a 0–100 quality score across 5 dimensions.</div>
-			<div class="flow-code">skill-tools check ./skills/</div>
-		</div>
-		<div class="flow-step">
-			<div class="flow-num">3</div>
-			<div class="flow-title">Route at runtime</div>
-			<div class="flow-desc">BM25 full-text search picks the right skill from thousands. No API keys, no GPU, instant results.</div>
-			<div class="flow-code">router.select('deploy my app')</div>
-		</div>
+		<pre><code><span class="t-c"># generate a skill from an OpenAPI spec</span>
+<span class="t-p">$ </span>npx skillgen openapi ./petstore.yaml <span class="t-flag">-o</span> ./skills/
+
+<span class="t-c"># validate + lint + score in one shot</span>
+<span class="t-p">$ </span>skill-tools check ./skills/
+<span class="t-c">  ✓ valid   8/8 lint rules passed   score: 87/100</span>
+
+<span class="t-c"># or use the router in code</span>
+<span class="t-p">$ </span>node -e "
+  const &#123; SkillRouter &#125; = require('@skill-tools/router');
+  const r = new SkillRouter();
+  // index, select, done
+"</code></pre>
 	</div>
 </div>
 </section>
 
 <style>
 	.how-section { padding: 0; }
-
-	.flow {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		gap: 1.5rem;
-	}
-
-	.flow-step {
-		padding: 1.25rem;
-		border: 1px solid var(--border);
-		border-radius: 8px;
-	}
-
-	.flow-num {
-		font-size: 0.65rem;
-		font-weight: 700;
-		color: var(--blue);
-		background: var(--blue-bg);
-		border: 1px solid var(--blue-border);
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 22px;
-		height: 22px;
-		border-radius: 50%;
-		margin-bottom: 0.75rem;
-	}
-
-	.flow-title {
-		font-size: 0.82rem;
-		font-weight: 600;
-		margin-bottom: 0.35rem;
-	}
-
-	.flow-desc {
-		font-family: var(--font-body);
-		font-size: 0.78rem;
-		color: var(--muted);
-		line-height: 1.5;
-	}
-
-	.flow-code {
-		margin-top: 0.6rem;
-		font-size: 0.7rem;
-		color: var(--blue);
-		background: var(--bg2);
-		padding: 0.3rem 0.5rem;
-		border-radius: 4px;
-		display: inline-block;
-	}
-
-	@media (max-width: 768px) {
-		.flow { grid-template-columns: 1fr; }
-	}
 </style>

@@ -20,12 +20,11 @@ function scoreColor(s: number): string {
 }
 ---
 
-<Base title="Live Demo — skills.menu" description="Real-world analysis of 53 agent skills from Anthropic, OpenAI, and Vercel — parsed, validated, linted, scored, and routed with skill-tools.">
+<Base title="Live Demo — skills.menu" description="53 skills from 3 repos, run through parse, validate, lint, score, and route.">
 	<div class="demo-page">
 	<h1>Live Demo</h1>
 	<p>
-		Real-world analysis of <strong>{summary.totalSkills} agent skills</strong> from three public repositories,
-		processed through the full <code>skill-tools</code> pipeline.
+		<strong>{summary.totalSkills} skills</strong> from three public repos, run through every tool in the kit.
 	</p>
 
 	<div class="source-badges">
@@ -64,30 +63,28 @@ function scoreColor(s: number): string {
 		</div>
 	</div>
 
-	<!-- Pipeline -->
 	<div class="pipeline">
-		<div class="pipe-step"><span class="pipe-num">1</span> Parse</div>
-		<div class="pipe-arrow">&rarr;</div>
-		<div class="pipe-step"><span class="pipe-num">2</span> Validate</div>
-		<div class="pipe-arrow">&rarr;</div>
-		<div class="pipe-step"><span class="pipe-num">3</span> Lint</div>
-		<div class="pipe-arrow">&rarr;</div>
-		<div class="pipe-step"><span class="pipe-num">4</span> Score</div>
-		<div class="pipe-arrow">&rarr;</div>
-		<div class="pipe-step"><span class="pipe-num">5</span> Route</div>
+		<div class="pipe-step">parse</div>
+		<div class="pipe-arrow">→</div>
+		<div class="pipe-step">validate</div>
+		<div class="pipe-arrow">→</div>
+		<div class="pipe-step">lint</div>
+		<div class="pipe-arrow">→</div>
+		<div class="pipe-step">score</div>
+		<div class="pipe-arrow">→</div>
+		<div class="pipe-step">route</div>
 	</div>
 
-	<!-- Step 1: Parse -->
-	<h2>Step 1: Parse &mdash; <code>@skill-tools/core</code></h2>
+	<!-- Parse -->
+	<h2>Parse</h2>
 	<p>
-		Each SKILL.md is parsed into structured data: YAML frontmatter, markdown body, file references, and token counts.
-		<strong>{summary.parsed}/{summary.totalSkills}</strong> skills parsed successfully.
+		YAML frontmatter + markdown body + file references + token count.
+		<strong>{summary.parsed}/{summary.totalSkills}</strong> parsed.
 	</p>
 
 	{summary.totalSkills - summary.parsed > 0 && (
 		<blockquote class="callout callout-info">
-			<strong>Note:</strong> The {summary.totalSkills - summary.parsed} parse failures below are caused by <strong>missing files in the upstream repositories</strong> &mdash; the SKILL.md files reference companion files (scripts, assets, references) that don't exist in the source repos.
-			For example, both <code>skill-creator</code> skills are documentation templates that intentionally list example file paths as illustrations. This is not a skill-tools bug.
+			The {summary.totalSkills - summary.parsed} failures are upstream — those SKILL.md files reference companion files that don't exist in their repos.
 		</blockquote>
 	)}
 
@@ -131,17 +128,17 @@ function scoreColor(s: number): string {
 		</table>
 	</div>
 
-	<!-- Step 2: Validate -->
-	<h2>Step 2: Validate &mdash; <code>skill-tools validate</code></h2>
+	<!-- Validate -->
+	<h2>Validate</h2>
 	<p>
-		Structural validation checks directory layout, file references, and spec compliance.
+		Directory layout, file references, spec compliance.
 		<strong class="text-green">{summary.validationPassed} passed</strong>,
 		<strong class="text-red">{summary.validationFailed} failed</strong>.
 	</p>
 
 	{summary.validationFailed > 0 && (
 		<blockquote class="callout callout-info">
-			<strong>Root cause:</strong> All {summary.validationFailed} validation failures are <code>file-reference-exists</code> errors &mdash; the upstream SKILL.md files reference companion files or directories that are missing from their source repositories. The <code>skill-creator</code> skills are documentation templates with intentional example paths; the others (<code>jupyter-notebook</code>, <code>notion-research-documentation</code>) appear to have incomplete asset directories in the upstream repos.
+			All {summary.validationFailed} failures are <code>file-reference-exists</code> — the upstream skills reference files that aren't in their repos.
 		</blockquote>
 	)}
 
@@ -209,21 +206,14 @@ function scoreColor(s: number): string {
 		</table>
 	</div>
 
-	<!-- Step 3: Lint -->
-	<h2>Step 3: Lint &mdash; <code>skill-tools lint</code></h2>
+	<!-- Lint -->
+	<h2>Lint</h2>
 	<p>
-		Best-practice analysis: description quality, instruction clarity, error handling, heading consistency, security.
 		<strong class="text-red">{summary.lintErrors} errors</strong>,
 		<strong class="text-orange">{summary.lintWarnings} warnings</strong>,
-		<strong class="text-dim">{summary.lintInfo} info</strong>.
+		<strong class="text-dim">{summary.lintInfo} info</strong>
+		— all findings are about the upstream skill content, not the tooling.
 	</p>
-
-	<blockquote class="callout callout-info">
-		<strong>Root cause:</strong> All findings are about the <strong>upstream skill content</strong>, not skill-tools itself.
-		Lint errors are hardcoded <code>/tmp/</code> paths in upstream instructions (<code>no-hardcoded-paths</code>).
-		Warnings flag upstream descriptions missing trigger keywords or using generic verbs.
-		Info items suggest upstream skills add error handling sections or fix heading hierarchy.
-	</blockquote>
 
 	<div class="table-wrap">
 		<table>
@@ -281,11 +271,10 @@ function scoreColor(s: number): string {
 		</table>
 	</div>
 
-	<!-- Step 4: Score -->
-	<h2>Step 4: Score &mdash; <code>skill-tools score</code></h2>
+	<!-- Score -->
+	<h2>Score</h2>
 	<p>
-		Quality scoring across 5 dimensions: Description Quality (30), Instruction Clarity (25), Spec Compliance (20), Progressive Disclosure (15), Security (10).
-		Average: <strong style={`color: ${scoreColor(summary.avgScore)}`}>{summary.avgScore}/100</strong>.
+		0–100 across 5 dimensions. Average: <strong style={`color: ${scoreColor(summary.avgScore)}`}>{summary.avgScore}/100</strong>.
 	</p>
 
 	<div class="table-wrap">
@@ -328,11 +317,10 @@ function scoreColor(s: number): string {
 		</table>
 	</div>
 
-	<!-- Step 5: Route -->
-	<h2>Step 5: Route &mdash; <code>@skill-tools/router</code></h2>
+	<!-- Route -->
+	<h2>Route</h2>
 	<p>
-		BM25 skill routing: given a natural-language query, the router ranks the best-matching skills.
-		<strong>{summary.indexedSkills}</strong> skills indexed.
+		BM25 over {summary.indexedSkills} indexed skills. Query in, ranked matches out.
 	</p>
 
 	<div class="route-grid">
@@ -357,10 +345,9 @@ function scoreColor(s: number): string {
 
 	<!-- Conflicts -->
 	{conflicts.length > 0 && (
-		<h2>Conflict Detection</h2>
+		<h2>Conflicts</h2>
 		<p>
-			Skills with highly overlapping descriptions that may confuse routing.
-			Threshold: <code>0.7</code>. These overlaps exist because the <strong>upstream skill descriptions</strong> are similar enough to create routing ambiguity &mdash; skill-tools surfaces these so authors can differentiate their skills.
+			Skill pairs with similarity above <code>0.7</code> — similar enough to confuse routing.
 		</p>
 		<div class="conflict-list">
 			{conflicts.map((c) => (
@@ -375,9 +362,9 @@ function scoreColor(s: number): string {
 		</div>
 	)}
 
-	<!-- How to reproduce -->
-	<h2>Reproduce This</h2>
-	<p>Run the full pipeline yourself:</p>
+	<!-- Reproduce -->
+	<h2>Try It</h2>
+	<p>Run it yourself:</p>
 	<div class="terminal">
 		<div class="terminal-bar">
 			<span class="tdot tdot-r"></span>
@@ -405,9 +392,7 @@ function scoreColor(s: number): string {
 <style>
 	/* Full-width demo page layout */
 	.demo-page {
-		max-width: 1400px;
-		margin: 0 auto;
-		padding: 3rem 3rem 4rem;
+		padding: 3rem 2.5rem 4rem;
 		line-height: 1.7;
 	}
 
@@ -545,26 +530,10 @@ function scoreColor(s: number): string {
 	}
 
 	.pipe-step {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
 		font-size: 0.78rem;
 		font-weight: 500;
 		color: var(--text);
 		white-space: nowrap;
-	}
-
-	.pipe-num {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 20px;
-		height: 20px;
-		border-radius: 50%;
-		background: var(--blue);
-		color: #fff;
-		font-size: 0.65rem;
-		font-weight: 700;
 	}
 
 	.pipe-arrow {

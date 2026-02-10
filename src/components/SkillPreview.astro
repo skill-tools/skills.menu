@@ -34,20 +34,16 @@ Check build logs if deployment fails.</code></pre>
 		</div>
 		<div class="annos">
 			<div class="anno">
-				<div class="anno-title">YAML Frontmatter</div>
-				<p>Machine-readable metadata: name, description, version, model requirements, token budget.</p>
+				<div class="anno-title">Frontmatter</div>
+				<p>Name, description, version. The router indexes the description for BM25 matching.</p>
 			</div>
 			<div class="anno">
-				<div class="anno-title">Trigger Context</div>
-				<p>The description tells the agent <em>when</em> to activate this skill. BM25 indexes it for routing.</p>
+				<div class="anno-title">Instructions</div>
+				<p>Plain markdown. Code blocks, numbered steps, prerequisites — whatever the agent needs to get the job done.</p>
 			</div>
 			<div class="anno">
-				<div class="anno-title">Step-by-Step Instructions</div>
-				<p>Markdown with code blocks, numbered steps, and prerequisites. The agent follows these to execute.</p>
-			</div>
-			<div class="anno">
-				<div class="anno-title">Error Recovery</div>
-				<p>What to do when things go wrong. Keeps the agent from getting stuck in a loop.</p>
+				<div class="anno-title">Error handling</div>
+				<p>What to try when things break. Without this, agents loop.</p>
 			</div>
 		</div>
 	</div>

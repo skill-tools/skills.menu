@@ -7,7 +7,7 @@ interface Props {
 	description?: string;
 }
 
-const { title, description = 'Open-source developer toolkit for agent skills. Build, validate, route, and generate SKILL.md files — the portable format for AI agent capabilities.' } = Astro.props;
+const { title, description = 'Developer toolkit for SKILL.md files. Parse, validate, lint, score, and route agent skills.' } = Astro.props;
 ---
 
 <!doctype html>
@@ -30,7 +30,7 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 	</head>
 	<body>
 		<header>
-			<div class="container header-inner">
+			<div class="header-inner">
 				<a href="/" class="logo">
 					<span class="logo-cursor"></span>
 					skills.menu
@@ -49,7 +49,7 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 		</main>
 
 		<footer>
-			<div class="container footer-inner">
+			<div class="footer-inner">
 				<span>Built for <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a></span>
 				<span>Apache-2.0 · <a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.npmjs.com/org/skill-tools" target="_blank" rel="noopener">npm</a></span>
 			</div>
@@ -73,6 +73,7 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		padding: 0 2.5rem;
 	}
 
 	.logo {
@@ -111,13 +112,15 @@ const { title, description = 'Open-source developer toolkit for agent skills. Bu
 		align-items: center;
 		font-size: 0.72rem;
 		color: var(--dim);
+		padding: 0 2.5rem;
 	}
 
 	.footer-inner a { color: var(--muted); }
 	.footer-inner a:hover { color: var(--text); }
 
 	@media (max-width: 768px) {
+		.header-inner { padding: 0 1.25rem; }
 		.nav-links { display: none; }
-		.footer-inner { flex-direction: column; text-align: center; gap: 0.5rem; }
+		.footer-inner { flex-direction: column; text-align: center; gap: 0.5rem; padding: 0 1.25rem; }
 	}
 </style>

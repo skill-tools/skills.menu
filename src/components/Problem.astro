@@ -4,26 +4,22 @@
 <section class="problem-section">
 <div class="container">
 	<div class="section-label">// the problem</div>
+	<p class="problem-intro">
+		Skills are just markdown files with YAML frontmatter — but without tooling,
+		they rot fast. Missing references, hardcoded paths, generic descriptions that confuse routing.
+	</p>
 	<div class="problem-grid">
-		<div class="problem-col before">
-			<h3><span class="icon">×</span> Without skill-tools</h3>
-			<ul>
-				<li>Skills are undocumented, scattered across repos</li>
-				<li>No way to validate against a spec</li>
-				<li>Agent picks wrong skill, wastes tokens</li>
-				<li>Hardcoded secrets leak into prompts</li>
-				<li>Manual OpenAPI → skill conversion</li>
-			</ul>
+		<div class="problem-item">
+			<code>skill-tools check</code> catches it.
+			Validates structure, lints for secrets and bad patterns, scores quality 0–100.
 		</div>
-		<div class="problem-col after">
-			<h3><span class="icon">→</span> With skill-tools</h3>
-			<ul>
-				<li>Portable SKILL.md format, one file per skill</li>
-				<li>Validate, lint, score in CI — like ESLint for skills</li>
-				<li>BM25 routes queries to the right skill instantly</li>
-				<li>8 lint rules catch secrets and hardcoded paths</li>
-				<li>Auto-generate from OpenAPI 3.x specs</li>
-			</ul>
+		<div class="problem-item">
+			<code>SkillRouter.select()</code> routes it.
+			BM25 full-text search picks the right skill from thousands, instantly.
+		</div>
+		<div class="problem-item">
+			<code>skillgen openapi</code> generates it.
+			Turn any OpenAPI 3.x spec into a valid SKILL.md.
 		</div>
 	</div>
 </div>
@@ -32,41 +28,36 @@
 <style>
 	.problem-section { padding: 0; }
 
+	.problem-intro {
+		font-family: var(--font-body);
+		font-size: 0.88rem;
+		color: var(--muted);
+		line-height: 1.7;
+		margin-bottom: 1.5rem;
+	}
+
 	.problem-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 2rem;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 1.5rem;
 	}
 
-	.problem-col h3 {
-		font-size: 0.82rem;
-		font-weight: 600;
-		margin-bottom: 0.75rem;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.icon { font-style: normal; font-size: 0.9rem; }
-
-	.before h3 { color: var(--muted); }
-	.after h3 { color: var(--blue); }
-
-	.problem-col ul {
-		list-style: none;
+	.problem-item {
 		font-family: var(--font-body);
 		font-size: 0.82rem;
 		color: var(--muted);
-		line-height: 1.8;
+		line-height: 1.6;
 	}
 
-	.problem-col ul li::before {
-		content: '—';
-		margin-right: 0.5rem;
-		color: var(--dim);
+	.problem-item code {
+		display: block;
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: var(--blue);
+		margin-bottom: 0.35rem;
 	}
 
 	@media (max-width: 768px) {
-		.problem-grid { grid-template-columns: 1fr; }
+		.problem-grid { grid-template-columns: 1fr; gap: 1rem; }
 	}
 </style>

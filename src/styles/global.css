@@ -24,8 +24,6 @@
 	--font: 'JetBrains Mono', monospace;
 	--font-body: 'Inter', system-ui, sans-serif;
 
-	/* Layout */
-	--max-w: 800px;
 }
 
 *,
@@ -95,9 +93,7 @@ h1, h2, h3, h4 {
 }
 
 .container {
-	max-width: var(--max-w);
-	margin: 0 auto;
-	padding: 0 1.5rem;
+	padding: 0 2.5rem;
 }
 
 /* --- Buttons --- */
