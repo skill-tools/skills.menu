@@ -8,6 +8,17 @@ import '../styles/global.css';
 ---
 
 <Base title="skills.menu — Developer toolkit for agent skills">
+	<script type="application/ld+json" set:html={JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'SoftwareApplication',
+		name: 'skill-tools',
+		description: 'Developer toolkit for SKILL.md files. Parse, validate, lint, score, and route agent skills.',
+		url: 'https://skills.menu',
+		applicationCategory: 'DeveloperApplication',
+		operatingSystem: 'Any',
+		offers: { '@type': 'Offer', price: '0' },
+		license: 'https://opensource.org/licenses/Apache-2.0',
+	})} slot="head" />
 	<Hero />
 	<div class="container">
 		<hr class="divider" />

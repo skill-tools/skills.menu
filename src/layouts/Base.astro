@@ -8,6 +8,9 @@ interface Props {
 }
 
 const { title, description = 'Developer toolkit for SKILL.md files. Parse, validate, lint, score, and route agent skills.' } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og-default.png', Astro.site);
 ---
 
 <!doctype html>
@@ -17,6 +20,19 @@ const { title, description = 'Developer toolkit for SKILL.md files. Parse, valid
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content={description} />
 		<meta name="generator" content={Astro.generator} />
+		<link rel="canonical" href={canonicalURL} />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:site_name" content="skills.menu" />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -27,6 +43,7 @@ const { title, description = 'Developer toolkit for SKILL.md files. Parse, valid
 
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<title>{title}</title>
+		<slot name="head" />
 	</head>
 	<body>
 		<header>
