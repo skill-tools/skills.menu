@@ -4,11 +4,13 @@
 <section class="hero">
 <div class="container">
 	<div class="badge">v0.2.0 · agentskills.io spec</div>
-	<h1>Lint, score, and route<br /><span class="highlight">SKILL.md</span> files</h1>
-	<p class="hero-desc">
-		Parse, validate, lint, and score SKILL.md files.
-		Route queries to the right skill with BM25. No API keys, no LLMs needed.
-	</p>
+	<h1>The <span class="highlight">SKILL.md</span> toolchain</h1>
+	<div class="hero-packages">
+		<div class="pkg"><strong>core</strong><span>parse &amp; validate</span></div>
+		<div class="pkg"><strong>cli</strong><span>lint &amp; score</span></div>
+		<div class="pkg"><strong>router</strong><span>BM25 retrieval</span></div>
+		<div class="pkg"><strong>gen</strong><span>scaffold from text or OpenAPI</span></div>
+	</div>
 	<div class="hero-actions">
 		<a href="https://github.com/skill-tools/skill-tools" target="_blank" rel="noopener" class="btn btn-primary">npm i -g skill-tools</a>
 		<a href="/try" class="btn">Try it →</a>
@@ -52,6 +54,33 @@
 		line-height: 1.7;
 	}
 
+	.hero-packages {
+		display: grid;
+		grid-template-columns: repeat(4, auto);
+		justify-content: center;
+		gap: 0.5rem 1.5rem;
+		margin: 0 auto 2.5rem;
+	}
+
+	.pkg {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.pkg strong {
+		font-family: var(--font-mono, 'SF Mono', Monaco, monospace);
+		font-size: 0.85rem;
+		color: var(--fg);
+	}
+
+	.pkg span {
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		color: var(--muted);
+	}
+
 	.hero-actions {
 		display: flex;
 		justify-content: center;
@@ -62,6 +91,7 @@
 	@media (max-width: 768px) {
 		.hero { padding: 3.5rem 0 2.5rem; }
 		h1 { font-size: 1.6rem; }
+		.hero-packages { grid-template-columns: repeat(2, auto); }
 		.hero-actions { flex-direction: column; align-items: center; }
 	}
 </style>
