@@ -86,7 +86,7 @@ Look for missing environment variables.`;
 			</details>
 
 			<details class="tool-ref">
-				<summary>Lint — 8 rules</summary>
+				<summary>Lint — 9 rules</summary>
 				<div class="ref-body">
 					<table>
 						<thead><tr><th>Rule</th><th>Severity</th><th>What it catches</th></tr></thead>
@@ -105,6 +105,11 @@ Look for missing environment variables.`;
 								<td><code>description-specificity</code></td>
 								<td><span class="sev-warn">warning</span></td>
 								<td>Generic verbs in description: <code>manage</code>, <code>handle</code>, <code>process</code>, <code>deal with</code>, <code>work with</code>, <code>do stuff</code>, <code>help with</code>, <code>assist with</code>, <code>take care of</code></td>
+							</tr>
+							<tr>
+								<td><code>description-length-optimal</code></td>
+								<td><span class="sev-info">info</span></td>
+								<td>Description outside 50–300 char sweet spot. Too short wastes routing accuracy; too long wastes metadata tier budget</td>
 							</tr>
 							<tr>
 								<td><code>description-trigger-keywords</code></td>
@@ -739,6 +744,13 @@ function runLint(raw) {
 			diags.push({ rule: 'description-specificity', sev: 'warning', msg: `Generic verbs: ${found.join(', ')}. Use specific action verbs instead` });
 	}
 
+	// description-length-optimal (info)
+	if (data.description) {
+		const dLen = data.description.length;
+		if (dLen < 50) diags.push({ rule: 'description-length-optimal', sev: 'info', msg: `Description is ${dLen} chars — under 50 is too short for reliable routing` });
+		else if (dLen > 300) diags.push({ rule: 'description-length-optimal', sev: 'info', msg: `Description is ${dLen} chars — over 300 wastes metadata tier token budget` });
+	}
+
 	// description-trigger-keywords (warning)
 	if (data.description) {
 		const trig = /\buse when\b|\buse for\b|\buse this\b|\binvoke when\b|\btrigger when\b/i;
@@ -784,7 +796,7 @@ function runLint(raw) {
 	lines.push('');
 
 	if (diags.length === 0) {
-		lines.push(green('✓ 8/8 rules passed — no issues'));
+		lines.push(green('✓ 9/9 rules passed — no issues'));
 	} else {
 		for (const d of diags) {
 			const icon = d.sev === 'error' ? red('✗') : d.sev === 'warning' ? orange('⚠') : dim('ℹ');

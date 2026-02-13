@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.0",
-    "@skill-tools/core": "^0.2.0",
-    "@skill-tools/router": "^0.2.0",
+    "@skill-tools/core": "^0.2.2",
+    "@skill-tools/router": "^0.2.2",
     "@vercel/analytics": "^1.6.1",
     "astro": "^5.17.1",
-    "skill-tools": "^0.2.0"
+    "skill-tools": "^0.2.2"
   }
 }

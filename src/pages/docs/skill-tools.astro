@@ -4,7 +4,7 @@ import Docs from '../../layouts/Docs.astro';
 
 <Docs
 	title="skill-tools CLI"
-	description="skill-tools CLI — Lint, score, and check SKILL.md files from the command line. 8 rules, 5 scoring dimensions."
+	description="skill-tools CLI — Lint, score, and check SKILL.md files from the command line. 9 rules, 5 scoring dimensions."
 >
 	<h1>skill-tools CLI</h1>
 	<p>
@@ -35,6 +35,16 @@ skill-tools score ./my-skill/ --min-score 60</code></pre>
 	<h3><code>skill-tools check &lt;path&gt;</code></h3>
 	<p>Runs validate + lint + score in one pass. Ideal for CI/CD.</p>
 
+	<h3><code>skill-tools init &lt;name&gt;</code></h3>
+	<p>Scaffold a new skill directory with a SKILL.md template.</p>
+	<pre><code>skill-tools init my-skill
+skill-tools init my-skill --with-scripts --with-references</code></pre>
+
+	<h3><code>skill-tools to-prompt &lt;path&gt;</code></h3>
+	<p>Generate <code>&lt;available_skills&gt;</code> XML for system prompt context injection.</p>
+	<pre><code>skill-tools to-prompt ./skills/
+skill-tools to-prompt ./skills/ --format json --include-location</code></pre>
+
 	<h2>Lint Rules</h2>
 	<p>All rules are deterministic pattern matching. No LLMs involved. Severity can be overridden via <code>.skill-toolsrc.yml</code>.</p>
 	<table>
@@ -60,6 +70,11 @@ skill-tools score ./my-skill/ --min-score 60</code></pre>
 				<td><code>description-specificity</code></td>
 				<td>warn</td>
 				<td>Generic verbs in description: <em>manage, handle, process, deal with, work with, do stuff, help with, assist with, take care of</em></td>
+			</tr>
+			<tr>
+				<td><code>description-length-optimal</code></td>
+				<td>info</td>
+				<td>Description outside 50&ndash;300 char sweet spot. Too short wastes routing accuracy; too long wastes metadata tier budget</td>
 			</tr>
 			<tr>
 				<td><code>description-trigger-keywords</code></td>

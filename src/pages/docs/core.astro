@@ -101,6 +101,26 @@ const result = parseSkillContent(rawMarkdown, '/path/SKILL.md', '/path');</code>
 				<td>warning</td>
 				<td>Referenced files should exist on disk</td>
 			</tr>
+			<tr>
+				<td><code>name-matches-directory</code></td>
+				<td>warning</td>
+				<td>Skill name should match the parent directory name</td>
+			</tr>
+			<tr>
+				<td><code>compatibility-type</code></td>
+				<td>error</td>
+				<td>Compatibility field must be a string</td>
+			</tr>
+			<tr>
+				<td><code>compatibility-length</code></td>
+				<td>warning</td>
+				<td>Compatibility field must be under 500 characters</td>
+			</tr>
+			<tr>
+				<td><code>license-type</code></td>
+				<td>error</td>
+				<td>License field must be a string</td>
+			</tr>
 		</tbody>
 	</table>
 
