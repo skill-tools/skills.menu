@@ -207,7 +207,7 @@ score(q, d) = &Sigma; IDF(t) &times; (tf(t,d) &times; (k1 + 1)) / (tf(t,d) + k1 
 
 normalized = score / max_score   # top result = 1.0</code></pre>
 
-					<h4>Contextual Enrichment <span class="dim-pts">v0.2.0</span></h4>
+					<h4>Contextual Enrichment <span class="dim-pts">v0.2.2</span></h4>
 					<p>Context terms are extracted deterministically from the skill body and prepended to the description before indexing:</p>
 					<ul>
 						<li><strong>Name parts</strong> — skill name split on <code>-</code> and <code>_</code></li>
@@ -1073,7 +1073,7 @@ function runRoute(raw, query) {
 		lines.push(`  1 skill: ${green(name)}`);
 		if (ctx) {
 			lines.push('');
-			lines.push(blue('Context (v0.2.0 — contextual BM25)'));
+			lines.push(blue('Context (v0.2.2 — contextual BM25)'));
 			lines.push(`  ${dim(ctx.length > 80 ? ctx.slice(0, 80) + '…' : ctx)}`);
 		}
 		lines.push('');
